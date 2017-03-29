@@ -82,6 +82,7 @@ var ScriptingIDEInterface = function (wickEditor) {
             data: {},
             success: function(data) {
                 window.wickDocs = "";
+                if(!data.docs) return;
                 data.docs.forEach(function (doc) {
                     doc.properties.forEach(function (prop) {
                         window.wickDocs += prop.name.split('(')[0] + "|"
