@@ -30,12 +30,21 @@ var WickPixiRenderer = function () {
 
     var canvasContainer;
 
+    var dirty;
+
     self.canvasScale;
     self.canvasTranslate;
     self.rendererView;
 
     self.setProject = function (wickProject) {
+        dirty = true;
+
         project = wickProject;
+
+        if(renderer)
+            self.refresh(project.rootObject);
+
+        dirty = false;
     }
 
     self.setup = function () {
@@ -138,7 +147,10 @@ var WickPixiRenderer = function () {
 
     self.refresh = function (wickObject) {
 
-        var pixiObjectExists = wickToPixiDict[wickObject.uuid] !== undefined;
+        if (dirty) 
+            pixiObjectExists = false;
+        else
+            pixiObjectExists = wickToPixiDict[wickObject.uuid] !== undefined;
 
         if(pixiObjectExists) {
             if(wickObject.isSymbol) {
