@@ -1,6 +1,6 @@
 # Wick
 
-![Wick editor screenshot](resources/editor.png)
+![Wick editor screenshot](site/img/home-message.png)
 
 Wick is an HTML5-based Flash-style editor and player for interactive media on the web.
 
