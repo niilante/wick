@@ -1,6 +1,6 @@
 # Wick
 
-![Wick editor screenshot](site/img/home-message.png)
+<img alt="Wick: The Internet's free and open source creation toolkit" src="site/img/home-message.png" alt="Drawing" width="500"/>
 
 Wick is an HTML5-based Flash-style editor and player for interactive media on the web.
 
