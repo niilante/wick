@@ -1,4 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 var WickObject = function () {
 
@@ -27,7 +42,8 @@ var WickObject = function () {
 
 // Common
     
-    this.wickScript = "this.onLoad = function () {\n\t\n}\n\nthis.onUpdate = function () {\n\t\n}\n\nthis.onClick = function () {\n\t\n}\n";
+    //this.wickScript = "function load() {\n\t\n}\n\nfunction update() {\n\t\n}\n";
+    this.wickScript = "";
 
 // Static
 
@@ -41,8 +57,8 @@ var WickObject = function () {
 
 // Symbols
 
-    // See design docs for how objects and symbols work.
     this.isSymbol = false;
+    this.isButton = false;
 
     // Used to keep track of what frame is being edited
     this.playheadPosition = null;
@@ -1026,9 +1042,46 @@ WickObject.prototype.play = function () {
     this._playing = true;
 }
 
-WickObject.prototype.pause = function () {
+WickObject.prototype.stop = function () {
 
     this._playing = false;
+}
+
+WickObject.prototype.getPlayrangeById = function (identifier) {
+    var foundPlayRange = null;
+
+    this.playRanges.forEach(function (playRange) {
+        if(playRange.identifier === identifier) {
+            foundPlayRange = playRange;
+        }
+    });
+
+    return foundPlayRange;
+}
+
+WickObject.prototype.getFramesInPlayrange = function (playrange) {
+    var frames = [];
+
+    this.layers.forEach(function (layer) {
+        for(var i = playrange.start; i < playrange.end; i++) {
+            var frame = layer.getFrameAtPlayheadPosition(i);
+            if(frame && !frames.includes(frame)) {
+                frames.push(frame);
+            }
+        }
+    });
+
+    return frames;
+}
+
+WickObject.prototype.gotoAndStop = function (frame) {
+    this.movePlayheadTo(frame);
+    this.stop();
+}
+
+WickObject.prototype.gotoAndPlay = function (frame) {
+    this.movePlayheadTo(frame);
+    this.play();
 }
 
 WickObject.prototype.movePlayheadTo = function (frame) {
@@ -1049,12 +1102,7 @@ WickObject.prototype.movePlayheadTo = function (frame) {
 
     } else if (CheckInput.isString(frame)) {
 
-        var foundPlayRange = null;
-        this.playRanges.forEach(function (playRange) {
-            if(playRange.identifier === frame) {
-                foundPlayRange = playRange;
-            }
-        });
+        var foundPlayRange = this.getPlayrangeById(frame)
 
         if(foundPlayRange) {
             if(this.playheadPosition < foundPlayRange.start || this.playheadPosition >= foundPlayRange.end) {
@@ -1259,7 +1307,7 @@ WickObject.prototype.isPointInside = function(point) {
 
 WickObject.prototype.setText = function (text) {
     //this.pixiText.text = ""+text;
-    wickPlayer.renderer.setText(this, text);
+    wickRenderer.setText(this, text);
 }
 
 WickObject.prototype.playSound = function () {
@@ -1281,10 +1329,6 @@ WickObject.prototype.setVolume = function (volume) {
 WickObject.prototype.clone = function () {
     return wickPlayer.cloneObject(this);
 };
-
-WickObject.prototype.isClone = function () {
-    return this._isClone;
-}
 
 WickObject.prototype.delete = function () {
     return wickPlayer.deleteObject(this);
@@ -1325,17 +1369,9 @@ WickObject.prototype.prepareForPlayer = function () {
         this._playing = true;
         this._active = false;
 
-        this.setupScript = function () {
-            eval(this.wickScript);
-        }
-        this.setupScript();
         this.getAllFrames().forEach(function (frame) {
-            frame._active = false;
-            frame.setupScript = function () {
-                eval(this.wickScript);
-            }
-            frame.setupScript();
-        })
+            //frame.prepareForPlayer();
+        });
     }
 
     // Reset the mouse hovered over state flag
@@ -1413,17 +1449,6 @@ WickObject.prototype.generateAlphaMask = function (imageData) {
 
 }
 
-WickObject.prototype.isClickable = function () {
-    if(!this.isSymbol) return false;
-
-    if(this._isClickable === undefined) {
-        var _onClickFnBody = this.onClick.toString().match(/function[^{]+\{([\s\S]*)\}$/)[1];
-        this._isClickable =  $.trim( _onClickFnBody ) !== '';
-    }
-
-    return this._isClickable;
-}
-
 WickObject.prototype.getCurrentFrames = function () {
     var currentFrames = [];
 
@@ -1435,39 +1460,51 @@ WickObject.prototype.getCurrentFrames = function () {
     return currentFrames;
 }
 
-WickObject.prototype.update = function () {
+WickObject.prototype.getFramesAtPlayheadPosition = function () {
+
+}
+
+WickObject.prototype.tick = function () {
     if(this._deleted) return;
 
     if(this.isSymbol) {
         this.layers.forEach(function (layer) {
             layer.frames.forEach(function (frame) {
-                frame.update();
+                frame.tick();
             });
         });
     }
 
+    if(this.isButton) {
+        this.stop();
+        if(this._wasClicked) {
+            if(this.getFramesInPlayrange(this.getPlayrangeById('mousedown')).length > 0)
+                this.movePlayheadTo('mousedown');
+        } else if (this.hoveredOver) {
+            if(this.getFramesInPlayrange(this.getPlayrangeById('mouseover')).length > 0)
+                this.movePlayheadTo('mouseover');
+        } else {
+            if(this.getFramesInPlayrange(this.getPlayrangeById('mouseup')).length > 0)
+                this.movePlayheadTo('mouseup');
+        }
+    }
+
     if(this._wasClicked) {
-        (wickEditor || wickPlayer).project.runScript(this, 'onClick');
+        (wickEditor || wickPlayer).project.runScript(this, 'mousedown');
         this._wasClicked = false;
     }
 
-    /*if(this.uuid.substring(0,2) === '35') {
-        if(this._active) {
-            console.log("ACTIVE!")
-        } else {
-            console.log("INACTIVE!")
-        }
-    }*/
-
     // Inactive -> Inactive
     if (!this._wasActiveLastTick && !this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("I -> I");
+
     }
     // Inactive -> Active
     else if (!this._wasActiveLastTick && this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("I -> A");
+        (wickEditor || wickPlayer).project.loadScriptOfObject(this);
 
-        (wickEditor || wickPlayer).project.runScript(this, 'onLoad');
+        (wickEditor || wickPlayer).project.runScript(this, 'load');
+
+        this.advanceTimeline();
 
         if(this.autoplaySound) {
             this.playSound();
@@ -1475,27 +1512,34 @@ WickObject.prototype.update = function () {
     }
     // Active -> Active
     else if (this._wasActiveLastTick && this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("A -> A");
+        (wickEditor || wickPlayer).project.runScript(this, 'update');
 
-        (wickEditor || wickPlayer).project.runScript(this, 'onUpdate');
+        this.advanceTimeline();
     }
     // Active -> Inactive
     else if (this._wasActiveLastTick && !this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("A -> I");
-
         if(!this.parentFrame.alwaysSaveState) {
             // THIS IS VERY BROKEN AND DANGEROUS. DO NOT USE.
             //wickPlayer.resetStateOfObject(this);
         }
     }
 
+    if(this.fontData) {
+        if(this.varName) {
+            (wickEditor || wickPlayer).project.loadBuiltinFunctions(this);
+            this.setText(eval(this.varName));
+        }
+    }
+
+}
+
+WickObject.prototype.advanceTimeline = function () {
     if(this._playing && this.isSymbol && this._newPlayheadPosition === undefined) {
         this._newPlayheadPosition = this.playheadPosition+1;
         if(this._newPlayheadPosition >= this.getTotalTimelineLength()) {
             this._newPlayheadPosition = 0;
         }
     }
-
 }
 
 WickObject.prototype.isActive = function () {

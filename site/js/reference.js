@@ -1,94 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    
-<title>It's Wick!</title>
-<link href='https://fonts.googleapis.com/css?family=PT+Sans' rel='stylesheet' type='text/css'>
-<link href='style.css' rel='stylesheet' type='text/css'>
-<script src="../lib/jquery.min.js"></script>
-<link rel="stylesheet" href="../lib/highlight/styles/github.css">
-<script src="../lib/highlight/highlight.pack.js"></script>
-<meta charset="utf-8">
-	
-</head>
-
-<body>
-    
-<h1>Reference</h1>
-
-<h3>
-    <span id="toc" style="font-weight:normal; display: inline-block; margin-right:20px;">
-    </span>
-</h3>
-
-<style>
-.groupName {
-	font-size: 24px;
-	margin-left: 75px;
-	line-height: 24px;
-	font-weight: bold;
-	margin-bottom: 25px;
-	margin-top: 25px;
-}
-.title {
-    font-weight: bold;
-    margin-bottom: 3px;
-    margin-left: 10px;
-}
-.propertyName {
-    margin-left: 10px;
-    margin-top: 5px;
-    font-family: monospace;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-.propertyDescription {
-    font-weight: normal;
-    margin-left: 10px;
-    margin-bottom: 15px;
-}
-.propertyExample {
-    font-family: monospace;
-    font-weight: normal;
-    margin-left: 10px;
-    margin-bottom: 5px;
-    background-color: #F3F3F3;
-}
-.propertyParameter {
-    font-weight: normal;
-    margin-left: 10px;
-    margin-bottom: 15px;
-}
-.propertyReturns {
-    font-weight: normal;
-    margin-left: 10px;
-    margin-bottom: 15px;
-}
-.groupBox {
-    /*background-color: #DDF;*/
-    border: 1px solid;
-    margin-left: 100px;
-    width: calc(100% - 350px);
-    min-width: 500px;
-    padding: 5px;
-    margin-bottom: 15px;
-}
-.spacer {
-    height: 200px;
-}
-hr {
-    border-top:1px dotted #000;
-    margin-bottom: 20px;
-}
-pre {
-    margin-top: 10px;
-    margin-left: 10px;
-    margin-right: 10px;
-}
-</style>
-
-
-<script>
 var docs;
 
 // ugh
@@ -115,7 +24,6 @@ function buildPage () {
 	    var groupName = newElem('div', 'groupName', group.name);
         groupName.id = group.name;
         document.getElementById('toc').innerHTML += '&#8226; <a href="#'+group.name+'">'+group.name+'</a><br />';
-
         group.properties.forEach(function (property) {
             var box = newElem('div', 'groupBox');
             
@@ -139,12 +47,10 @@ function buildPage () {
             newElem('div', 'title', 'Example:', box);
             /*newElem('div', 'propertyExample', property.example.replaceAll("\n", "<br />").replaceAll("\t", "&nbsp&nbsp&nbsp&nbsp"), box);*/
             var exampleCodeString = property.example
-            box.innerHTML += '<pre><code class="javascript">'+exampleCodeString+'</code></pre>';
+            box.innerHTML += '<pre class="propertyExample"><code class="javascript">'+exampleCodeString+'</code></pre>';
         });
     });
-
     newElem('div', 'spacer');
-
     // Tell highlight.js to highlight the example code
     $(document).ready(function() {
       $('pre code').each(function(i, block) {
@@ -155,7 +61,7 @@ function buildPage () {
 
 // Load the json file with all the docs info
 $.ajax({
-    url: "../src/project/Docs.json",
+    url: "../../src/project/Docs.json",
     type: 'GET',
     data: {},
     success: function(data) {
@@ -169,6 +75,3 @@ $.ajax({
         
     }
 });
-</script>
-
-</body>

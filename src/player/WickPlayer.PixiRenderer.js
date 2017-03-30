@@ -1,6 +1,21 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
-var WickPixiRenderer = function (project, canvasContainer, scale, args) {
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+
+var WickPixiRenderer = function () {
 
     var self = this;
 
@@ -11,14 +26,32 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
 
     var wickToPixiDict;
 
+    var project;
+
+    var canvasContainer;
+
+    var dirty;
+
     self.canvasScale;
     self.canvasTranslate;
-    self.rendererCanvas;
+    self.rendererView;
+
+    self.setProject = function (wickProject) {
+        dirty = true;
+
+        project = wickProject;
+
+        if(renderer)
+            self.refresh(project.rootObject);
+
+        dirty = false;
+    }
 
     self.setup = function () {
 
-        renderScale = scale
-        if(!renderScale) renderScale = 1;
+        renderScale = 1;
+
+        canvasContainer = window.rendererCanvas;
 
         // update canvas size on window resize
         window.addEventListener('resize', resizeCanvas, false);
@@ -38,7 +71,7 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
         // Add renderer canvas
         canvasContainer.appendChild(renderer.view);
         renderer.view.id = "rendererCanvas";
-        self.rendererCanvas = renderer.view;
+        self.rendererView = renderer.view;
 
         stage = new PIXI.Container();
 
@@ -56,7 +89,7 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
             if(project.borderColor) document.body.style.backgroundColor = project.borderColor;
         }
         // Fix focus issues
-        self.rendererCanvas.className = ''
+        self.rendererView.className = ''
         setTimeout(function () {
             $('#rendererCanvas').focus();
         }, 100);
@@ -108,9 +141,16 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
         renderer.render(wickToPixiDict[project.rootObject.uuid]);
     }
 
+    self.clear = function () {
+        
+    }
+
     self.refresh = function (wickObject) {
 
-        var pixiObjectExists = wickToPixiDict[wickObject.uuid] !== undefined;
+        if (dirty) 
+            pixiObjectExists = false;
+        else
+            pixiObjectExists = wickToPixiDict[wickObject.uuid] !== undefined;
 
         if(pixiObjectExists) {
             if(wickObject.isSymbol) {
@@ -130,7 +170,7 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
         } else if (wickObject.imageData) {
 
             pixiObject = PIXI.Sprite.fromImage(wickObject.imageData);
-            wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
+            //wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
 
         } else if (wickObject.pathData) {
 
@@ -140,7 +180,7 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
             var base64svg = 'data:image/svg+xml;base64,' + window.btoa(s);
             
             pixiObject = PIXI.Sprite.fromImage(base64svg);
-            wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
+            //wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
 
         } else if (wickObject.fontData) {
 
@@ -180,6 +220,8 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
         var pixiObject = wickToPixiDict[wickObject.uuid];
         if(!pixiObject) return;
 
+        if(!wickObject.alphaMask && (wickObject.imageData || wickObject.pathData)) wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
+
         pixiObject.visible = true;
         pixiObject.anchor = new PIXI.Point(0.5, 0.5);
         pixiObject.position.x = Math.round(wickObject.x);
@@ -212,7 +254,7 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
             console.log(elem)
         } else {
             // Not inside iframe
-            elem = self.rendererCanvas;
+            elem = self.rendererView;
         }
 
         if (screenfull.enabled) {
@@ -262,10 +304,12 @@ var WickPixiRenderer = function (project, canvasContainer, scale, args) {
     }
 
     this.cleanup = function() {
+        return;
+
         window.removeEventListener('resize', resizeCanvas);
 
         // Get rid of old canvas
-        var oldRendererCanvas = self.rendererCanvas
+        var oldRendererCanvas = self.rendererView
         if(oldRendererCanvas) {
             canvasContainer.removeChild(canvasContainer.childNodes[0]);
         }
