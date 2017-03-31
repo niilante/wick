@@ -20,11 +20,11 @@ var InspectorInterface = function (wickEditor) {
     var inspectorDiv;
     var inputs;
 
-    var StringInput = function (getValueFn, onChangeFn) {
+    var StringInput = function (className, getValueFn, onChangeFn) {
 
         var self = this;
         var elem = document.createElement('input');
-        elem.class = 'inspector-string-input';
+        elem.class = 'inspector-string-input ' + className;
 
         self.sync = function () {
             elem.value = self.getValueFn();
@@ -45,6 +45,7 @@ var InspectorInterface = function (wickEditor) {
         inputs = [];
 
         inputs.push(new StringInput(
+            'object-name',
             function () {
                 return wickEditor.project.getSelectedObject().name;
             }, 
