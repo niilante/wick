@@ -1,4 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* GuiActionHandler.js - Interface for routines that don't need undo/redo functionality */
 
@@ -159,7 +174,7 @@ var GuiActionHandler = function (wickEditor) {
         });
 
     // Export Project
-    registerAction('exportProject',
+    registerAction('exportProjectHTML',
         ['Modifier','SHIFT','S'],
         ['exportHTMLButton'],
         {usableInTextBoxes:true},
@@ -168,6 +183,17 @@ var GuiActionHandler = function (wickEditor) {
             that.specialKeys = [];
             wickEditor.project.saveInLocalStorage();
             WickProject.Exporter.exportProject(wickEditor.project);
+        });
+
+    registerAction('exportProjectJSON',
+        [],
+        ['exportProjectAsJSONButton'],
+        {},
+        function(args) {
+            wickEditor.project.getAsJSON(function(JSONProject) {
+                var blob = new Blob([JSONProject], {type: "text/plain;charset=utf-8"});
+                saveAs(blob, wickEditor.project.name+".json");
+            }, '\t');
         });
 
     // Export Project as .zip
@@ -187,7 +213,7 @@ var GuiActionHandler = function (wickEditor) {
         [],
         {},
         function (args) {
-            wickEditor.fabric.projectRenderer.renderProjectAsGIF(function (blob) {
+            wickEditor.gifRenderer.renderProjectAsGIF(function (blob) {
                 saveAs(blob, wickEditor.project.name+".gif");
                 //window.open(URL.createObjectURL(blob));
             });
@@ -199,9 +225,7 @@ var GuiActionHandler = function (wickEditor) {
         [],
         {},
         function (args) {
-            wickEditor.fabric.projectRenderer.renderProjectAsWebM(function () {
-                
-            });
+            alert("NYI")
         });
 
     // Control + O
@@ -387,9 +411,14 @@ var GuiActionHandler = function (wickEditor) {
             wickEditor.rightclickmenu.open = false;
             that.keys = [];
 
-            //if(!isChrome) {
-                polyfillClipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData(wickEditor.fabric.getSelectedObjects(WickObject)));
-            //}
+            var copyData = wickEditor.project.getCopyData();
+            var copyType
+            if(wickEditor.project.getSelectedObjects()[0] instanceof WickObject) {
+                copyType = 'text/wickobjectsjson';
+            } else {
+                copyType = 'text/wickframesjson';
+            }
+            polyfillClipboardData.setData(copyType, copyData);
 
             wickEditor.syncInterfaces();
         });
@@ -402,9 +431,7 @@ var GuiActionHandler = function (wickEditor) {
             wickEditor.rightclickmenu.open = false;
             that.keys = [];
 
-            //if(!isChrome) {
-                polyfillClipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData(wickEditor.fabric.getSelectedObjects(WickObject)));
-            //}
+            polyfillClipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
 
             wickEditor.actionHandler.doAction('deleteObjects', { 
                 wickObjects:wickEditor.fabric.getSelectedObjects(WickObject) 
@@ -433,21 +460,32 @@ var GuiActionHandler = function (wickEditor) {
                 
                 if(fileType === 'text/wickobjectsjson') {
                     var objs = WickObject.fromJSONArray(JSON.parse(file));
+                    // Make sure to reset uuids!
                     objs.forEach(function (obj) {
                         obj.getAllChildObjectsRecursive().forEach(function (child) {
                             child.uuid = random.uuid4();
+                        });
+                        obj.getAllFrames().forEach(function (frame) {
+                            frame.uuid = random.uuid4();
                         });
                     });
                     wickEditor.actionHandler.doAction('addObjects', {
                         wickObjects:objs
                     });
-                /*} else if (fileType === 'text/plain') {
-                    var newObj = WickObject.fromText(file);
-                    newObj.x = wickEditor.project.width/2;
-                    newObj.y = wickEditor.project.height/2;
-                    wickEditor.actionHandler.doAction('addObjects', {
-                        wickObjects:[newObj]
-                    });*/
+                } else if (fileType === 'text/wickframesjson') {
+                    var frames = WickFrame.fromJSONArray(JSON.parse(file));
+                    frames.forEach(function (frame) {
+                        frame.uuid = random.uuid4();
+
+                        frame.wickObjects.forEach(function (wickObject) {
+                            wickObject.getAllChildObjectsRecursive().forEach(function (child) {
+                                child.uuid = random.uuid4();
+                            });
+                        });
+                    });
+                    wickEditor.actionHandler.doAction('addFrames', {
+                        frames:frames
+                    });
                 } else if (fileType.includes('image')) {
                     //console.log(items[i])
                     reader = new FileReader();
@@ -479,26 +517,13 @@ var GuiActionHandler = function (wickEditor) {
                 return;
             }
 
-            wickEditor.thumbnailRenderer.cleanup();
-
             wickEditor.actionHandler.clearHistory();
             wickEditor.project = new WickProject();
             localStorage.removeItem("wickProject");
             wickEditor.fabric.recenterCanvas();
             wickEditor.syncInterfaces();
 
-            wickEditor.thumbnailRenderer.setup();
-        });
-
-    registerAction('exportProjectAsJSON',
-        [],
-        ['exportProjectAsJSONButton'],
-        {},
-        function(args) {
-            wickEditor.project.getAsJSON(function(JSONProject) {
-                var blob = new Blob([JSONProject], {type: "text/plain;charset=utf-8"});
-                saveAs(blob, "project.json");
-            });
+            window.wickRenderer.setProject(wickEditor.project);
         });
 
     registerAction('saveProjectToLocalStorage',
@@ -706,9 +731,19 @@ var GuiActionHandler = function (wickEditor) {
         ['convertToSymbolButton', 'createSymbolButton'],
         {},
         function(args) {
-            var fabCanvas = wickEditor.fabric.canvas;
             wickEditor.actionHandler.doAction('convertObjectsToSymbol', {
                 objects: wickEditor.fabric.getSelectedObjects(WickObject)
+            });
+        });
+
+    registerAction('convertToButton',
+        ['Modifier', 'SHIFT', '8'],
+        ['convertToSymbolButton', 'createSymbolButton'],
+        {},
+        function(args) {
+            wickEditor.actionHandler.doAction('convertObjectsToSymbol', {
+                objects: wickEditor.fabric.getSelectedObjects(WickObject),
+                button: true
             });
         });
 

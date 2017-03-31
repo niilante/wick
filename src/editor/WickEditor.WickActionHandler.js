@@ -1,4 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* WickActionHandler - General Logic for how undo and redo is handled in the Wick editor. */
 /* Only add routines to WickActionHandler if they:
@@ -387,6 +402,13 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.addObject(symbol, symbolZIndex, true);
             args.createdSymbol = symbol;
 
+            if(args.button) {
+                symbol.addPlayRange(new WickPlayRange(0,1,'mouseup'));
+                symbol.addPlayRange(new WickPlayRange(1,2,'mouseover'));
+                symbol.addPlayRange(new WickPlayRange(2,3,'mousedown'));
+                symbol.isButton = true;
+            }
+
             // Remove objects from original parent (they are inside the symbol now.)
             objects.forEach(function (wickObject) {
                 wickEditor.project.currentObject.removeChild(wickObject);
@@ -506,6 +528,18 @@ var WickActionHandler = function (wickEditor) {
 
             done();
         });
+
+    registerAction('addFrames',
+        function (args) {
+            var currentObject = wickEditor.project.getCurrentObject();
+
+            args.frames.forEach(function (frame) {
+                currentObject.layers[0].frames.push(frame);
+            });
+        },
+        function (args) {
+            
+        })
 
     registerAction('addNewFrame',
         function (args) {

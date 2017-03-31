@@ -1,5 +1,20 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
 /* WickProject Exporter */
 /* Bundles WickProjects with the WickPlayer in a single HTML file. */
 
@@ -7,8 +22,8 @@ WickProject.Exporter = (function () {
 
     var projectExporter = { };
 
-    projectExporter.bundleProjectToHTML = function (wickProject, callback) {
-
+    projectExporter.generatePlayer = function () {
+        
         var fileOut = "";
 
         // Add the player webpage (need to download the empty player)
@@ -37,6 +52,7 @@ WickProject.Exporter = (function () {
             "src/project/WickFrame.js",
             "src/project/WickLayer.js",
             "src/project/WickObject.js",
+            "src/project/WickPlayRange.js",
             "src/project/WickProject.js",
             "src/project/WickProject.Compressor.js",
             "src/player/WickPlayer.Preloader.js",
@@ -54,6 +70,20 @@ WickProject.Exporter = (function () {
             fileOut += "<script>" + script + "</script>\n";
         });
         console.log(totalSize + " total");
+
+        return fileOut;
+
+    }
+
+    projectExporter.exportPlayer = function () {
+        var emptyplayerString = projectExporter.generatePlayer();
+        var blob = new Blob([emptyplayerString], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "player.html")
+    }
+
+    projectExporter.bundleProjectToHTML = function (wickProject, callback) {
+
+        var fileOut = projectExporter.generatePlayer();
 
         // Bundle the JSON project
         wickProject.getAsJSON(function (JSONProject) {

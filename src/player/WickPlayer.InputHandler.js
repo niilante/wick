@@ -1,4 +1,21 @@
-WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
+WickPlayerInputHandler = function (wickPlayer) {
 
     var self = this;
 
@@ -8,7 +25,11 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
 
     var project;
 
+    var canvasContainer;
+
     self.setup = function () {
+        canvasContainer = window.rendererCanvas;
+
         mouse = { x : 0, y : 0 };
         keys = [];
         keysJustPressed = [];
@@ -67,17 +88,17 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
     }
 
     self.hideCursor = function () {
-        wickPlayer.renderer.rendererCanvas.className = 'hideCursor'
+        canvasContainer.className = 'hideCursor'
     }
 
     self.showCursor = function () {
-        wickPlayer.renderer.rendererCanvas.className = ''
+        canvasContainer.className = ''
     }
 
 
     var onMouseMove = function (evt) {
 
-        mouse = getMousePos(wickPlayer.renderer.rendererCanvas, evt);
+        mouse = getMousePos(canvasContainer, evt);
 
         // Check if we're hovered over a clickable object...
         var hoveredOverObj = null;
@@ -91,18 +112,18 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
         });
 
         //...and change the cursor if we are
-        if(hoveredOverObj && hoveredOverObj.isClickable()) {
-            wickPlayer.canvasContainer.style.cursor = hoveredOverObj.cursor || "pointer";
+        if(hoveredOverObj && hoveredOverObj.isButton) {
+            canvasContainer.style.cursor = hoveredOverObj.cursor || "pointer";
         } else {
-            wickPlayer.canvasContainer.style.cursor = "default";
+            canvasContainer.style.cursor = "default";
         }
 
     }
 
     var onMouseDown = function (evt) {
         
-        project.rootObject.getAllActiveChildObjectsRecursive(true).forEach(function(child) {
-            if(child.isClickable() && child.isPointInside(mouse)) {
+        project.rootObject.getAllActiveChildObjectsRecursive(true).forEachBackwards(function(child) {
+            if(child.isPointInside(mouse)) {
                 //project.runScript(child, "onClick");
                 child._wasClicked = true;
             }
@@ -140,15 +161,16 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
             wickPlayer.audioPlayer.setup(project);
         }
 
-        var touchPos = getTouchPos(wickPlayer.renderer.rendererCanvas, evt);
+        var touchPos = getTouchPos(canvasContainer, evt);
         mouse = touchPos;
 
         project.rootObject.getAllActiveChildObjects().forEach(function(child) {
-            if(child.isPointInside(touchPos) && child.isClickable()) {
+            if(child.isPointInside(touchPos)) {
                 //project.runScript(child, "onClick");
                 child._wasClicked = true;
             }
         });
+        
 
     }
 
@@ -156,7 +178,7 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
 
         evt.preventDefault();
         
-        var touchPos = getTouchPos(wickPlayer.renderer.rendererCanvas, evt);
+        var touchPos = getTouchPos(canvasContainer, evt);
         mouse = touchPos;
 
     }
@@ -172,11 +194,11 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
             mouseY -= canvasBoundingClientRect.top;
         }
 
-        mouseX -= wickPlayer.renderer.canvasTranslate.x;
-        mouseY -= wickPlayer.renderer.canvasTranslate.y;
+        mouseX -= window.wickRenderer.canvasTranslate.x;
+        mouseY -= window.wickRenderer.canvasTranslate.y;
 
-        mouseX /=  wickPlayer.renderer.canvasScale;
-        mouseY /=  wickPlayer.renderer.canvasScale;
+        mouseX /=  window.wickRenderer.canvasScale;
+        mouseY /=  window.wickRenderer.canvasScale;
 
         var centeredCanvasOffsetX = (window.innerWidth  - project.width) / 2;
         var centeredCanvasOffsetY = (window.innerHeight - project.height) / 2;
@@ -205,11 +227,11 @@ WickPlayerInputHandler = function (wickPlayer, canvasContainer) {
             touchY -= canvasBoundingClientRect.top;
         }
 
-        touchX -= wickPlayer.renderer.canvasTranslate.x;
-        touchY -= wickPlayer.renderer.canvasTranslate.y;
+        touchX -= window.wickRenderer.canvasTranslate.x;
+        touchY -= window.wickRenderer.canvasTranslate.y;
 
-        touchX /=  wickPlayer.renderer.canvasScale;
-        touchY /=  wickPlayer.renderer.canvasScale;
+        touchX /=  window.wickRenderer.canvasScale;
+        touchY /=  window.wickRenderer.canvasScale;
 
         var centeredCanvasOffsetX = (window.innerWidth - project.width) / 2;
         var centeredCanvasOffsetY = (window.innerHeight - project.height) / 2;
