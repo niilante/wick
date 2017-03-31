@@ -411,9 +411,14 @@ var GuiActionHandler = function (wickEditor) {
             wickEditor.rightclickmenu.open = false;
             that.keys = [];
 
-            //if(!isChrome) {
-                polyfillClipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData(wickEditor.fabric.getSelectedObjects(WickObject)));
-            //}
+            var copyData = wickEditor.project.getCopyData();
+            var copyType
+            if(wickEditor.project.getSelectedObjects()[0] instanceof WickObject) {
+                copyType = 'text/wickobjectsjson';
+            } else {
+                copyType = 'text/wickframesjson';
+            }
+            polyfillClipboardData.setData(copyType, copyData);
 
             wickEditor.syncInterfaces();
         });
@@ -426,9 +431,7 @@ var GuiActionHandler = function (wickEditor) {
             wickEditor.rightclickmenu.open = false;
             that.keys = [];
 
-            //if(!isChrome) {
-                polyfillClipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData(wickEditor.fabric.getSelectedObjects(WickObject)));
-            //}
+            polyfillClipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
 
             wickEditor.actionHandler.doAction('deleteObjects', { 
                 wickObjects:wickEditor.fabric.getSelectedObjects(WickObject) 
@@ -469,13 +472,20 @@ var GuiActionHandler = function (wickEditor) {
                     wickEditor.actionHandler.doAction('addObjects', {
                         wickObjects:objs
                     });
-                /*} else if (fileType === 'text/plain') {
-                    var newObj = WickObject.fromText(file);
-                    newObj.x = wickEditor.project.width/2;
-                    newObj.y = wickEditor.project.height/2;
-                    wickEditor.actionHandler.doAction('addObjects', {
-                        wickObjects:[newObj]
-                    });*/
+                } else if (fileType === 'text/wickframesjson') {
+                    var frames = WickFrame.fromJSONArray(JSON.parse(file));
+                    frames.forEach(function (frame) {
+                        frame.uuid = random.uuid4();
+
+                        frame.wickObjects.forEach(function (wickObject) {
+                            wickObject.getAllChildObjectsRecursive().forEach(function (child) {
+                                child.uuid = random.uuid4();
+                            });
+                        });
+                    });
+                    wickEditor.actionHandler.doAction('addFrames', {
+                        frames:frames
+                    });
                 } else if (fileType.includes('image')) {
                     //console.log(items[i])
                     reader = new FileReader();

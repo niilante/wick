@@ -529,6 +529,18 @@ var WickActionHandler = function (wickEditor) {
             done();
         });
 
+    registerAction('addFrames',
+        function (args) {
+            var currentObject = wickEditor.project.getCurrentObject();
+
+            args.frames.forEach(function (frame) {
+                currentObject.layers[0].frames.push(frame);
+            });
+        },
+        function (args) {
+
+        })
+
     registerAction('addNewFrame',
         function (args) {
             var currentObject = wickEditor.project.currentObject;

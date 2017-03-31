@@ -209,10 +209,10 @@ var RightClickMenuInterface = function (wickEditor) {
                     wickEditor.guiActionHandler.doAction("convertFramesToSymbol")
                 }),*/
                 new RightClickMenuButton('Copy', function () {
-                    alert("NYI")
+                    wickEditor.guiActionHandler.doAction('copy');
                 }),
                 new RightClickMenuButton('Paste', function () {
-                    alert("NYI")
+                    wickEditor.guiActionHandler.doAction('paste');
                 }),
                 new RightClickMenuButton('Delete', function () {
                     wickEditor.guiActionHandler.doAction('deleteSelectedObjects');
