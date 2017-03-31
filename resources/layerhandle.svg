@@ -1,56 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="14px" height="13px" viewBox="0 0 14 13" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 42 (36781) - http://www.bohemiancoding.com/sketch -->
-    <title>Artboard 7 Copy</title>
+    <title>Gnurl</title>
     <desc>Created with Sketch.</desc>
-    <defs></defs>
-    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Artboard-7-Copy" fill="#FFFFFF">
-            <g id="Grip">
-                <g id="Slash">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy" transform="translate(6.000000, 0.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-2" transform="translate(12.000000, 0.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-3" transform="translate(12.000000, 6.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-8" transform="translate(12.000000, 12.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-4" transform="translate(6.000000, 6.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-7" transform="translate(6.000000, 12.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-5" transform="translate(0.000000, 6.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
-                </g>
-                <g id="Slash-Copy-6" transform="translate(0.000000, 12.000000)">
-                    <polygon id="Rectangle-4-Copy-2" fill-opacity="0.459861866" points="3 0 4 0 3 1"></polygon>
-                    <polygon id="Rectangle-4-Copy-3" fill-opacity="0.459861866" points="0 3 1 3 0 4"></polygon>
-                    <path d="M0.5,0 L3,0 L3,1 L1,1 L1,3 L0,3 L0,0 L0.5,0 Z" id="Combined-Shape" fill-opacity="0.74"></path>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#FFFFFF" stop-opacity="0.9" offset="0%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.875" offset="30%"></stop>
+            <stop stop-color="#FFFFFF" stop-opacity="0.85" offset="100%"></stop>
+        </linearGradient>
+        <path d="M2.66453526e-15,9.88235294 L13.6,9.88235294 L13.6,12.3529412 L2.66453526e-15,12.3529412 L2.66453526e-15,9.88235294 Z M2.66453526e-15,5.76470588 L13.6,5.76470588 L13.6,8.23529412 L2.66453526e-15,8.23529412 L2.66453526e-15,5.76470588 Z M2.66453526e-15,1.64705882 L13.6,1.64705882 L13.6,4.11764706 L2.66453526e-15,4.11764706 L2.66453526e-15,1.64705882 Z" id="path-2"></path>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-3">
+            <feOffset dx="0" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feComposite in="shadowOffsetOuter1" in2="SourceAlpha" operator="out" result="shadowOffsetOuter1"></feComposite>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.200000003 0" type="matrix" in="shadowOffsetOuter1"></feColorMatrix>
+        </filter>
+        <mask id="mask-4" maskContentUnits="userSpaceOnUse" maskUnits="objectBoundingBox" x="0" y="0" width="13.6" height="10.7058824" fill="white">
+            <use xlink:href="#path-2"></use>
+        </mask>
+    </defs>
+    <g id="Page-3" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="z-copy-17" transform="translate(-9.000000, -58.000000)">
+            <g id="Layer-Handle" transform="translate(7.000000, 45.000000)">
+                <g id="Gnurl" transform="translate(9.000000, 20.000000) rotate(-90.000000) translate(-9.000000, -20.000000) translate(3.000000, 13.000000)">
+                    <g id="apps" opacity="0.5" transform="translate(6.800000, 7.000000) rotate(90.000000) translate(-6.800000, -7.000000) ">
+                        <use fill="black" fill-opacity="1" filter="url(#filter-3)" xlink:href="#path-2"></use>
+                        <use stroke-opacity="0.1" stroke="#FFFFFF" mask="url(#mask-4)" stroke-width="1" fill="url(#linearGradient-1)" fill-rule="evenodd" xlink:href="#path-2"></use>
+                    </g>
+                    <rect id="Rectangle-21" fill-opacity="0.324020607" fill="#000000" x="8" y="0" width="0.8" height="14"></rect>
+                    <rect id="Rectangle-21-Copy" fill-opacity="0.324020607" fill="#000000" x="4" y="0" width="0.8" height="14"></rect>
+                    <rect id="Rectangle-21-Copy-2" fill-opacity="0.324020607" fill="#000000" x="0" y="0" width="0.8" height="14"></rect>
                 </g>
             </g>
         </g>
