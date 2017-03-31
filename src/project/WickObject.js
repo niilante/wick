@@ -204,12 +204,10 @@ WickObject.createSymbolFromWickObjects = function (wickObjects) {
 
     var firstFrame = symbol.layers[0].frames[0];
     for(var i = 0; i < wickObjects.length; i++) {
-        var ii = wickObjects.length-1-i; // So objects are properly ordered in symbol
+        firstFrame.wickObjects[i] = wickObjects[i];
 
-        firstFrame.wickObjects[ii] = wickObjects[i];
-
-        firstFrame.wickObjects[ii].x = wickObjects[i].x - symbol.x;
-        firstFrame.wickObjects[ii].y = wickObjects[i].y - symbol.y;
+        firstFrame.wickObjects[i].x = wickObjects[i].x - symbol.x;
+        firstFrame.wickObjects[i].y = wickObjects[i].y - symbol.y;
     }
 
     symbol.width  = firstFrame.wickObjects[0].width;

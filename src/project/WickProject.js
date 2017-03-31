@@ -243,9 +243,7 @@ WickProject.prototype.getCopyData = function () {
     var objectJSONs = [];
     var objects = this.getSelectedObjects();
     for(var i = 0; i < objects.length; i++) {
-        objects[i].uuidCopiedFrom = objects[i].uuid;
         objectJSONs.push(objects[i].getAsJSON());
-        objects[i].uuidCopiedFrom = null;
     }
     var clipboardObject = {
         /*position: {top  : group.top  + group.height/2,
