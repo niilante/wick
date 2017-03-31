@@ -538,7 +538,7 @@ var WickActionHandler = function (wickEditor) {
             });
         },
         function (args) {
-
+            
         })
 
     registerAction('addNewFrame',
