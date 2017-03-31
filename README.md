@@ -1,10 +1,8 @@
-# Wick
-
 <img alt="Wick: The Internet's free and open source creation toolkit" src="site/img/home-message.png" alt="Drawing" width="500"/>
 
-Wick is an HTML5-based Flash-style editor and player for interactive media on the web.
+# Wick
 
-Try the editor and see the demos [here](http://wickeditor.com/)!
+Wick is an HTML5-based Flash-style editor and player for interactive media on the web. Try the editor and see the demos [here](http://wickeditor.com/)!
 
 ### How to run the editor locally for development
 * Clone or download and unzip this repo
