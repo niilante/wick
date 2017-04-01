@@ -27,7 +27,6 @@ var ThumbnailRendererInterface = function (wickEditor) {
         /*thumbpreview = document.createElement('div')
         thumbpreview.className = 'thumbnailPreview';
         //document.body.appendChild(thumbpreview)
-        wickEditor.project.fitScreen = false;
 
         thumbRenderer = new WickPixiRenderer(wickEditor.project, thumbpreview, 0.2);
         thumbRenderer.setup();*/

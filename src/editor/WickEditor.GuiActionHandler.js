@@ -420,6 +420,8 @@ var GuiActionHandler = function (wickEditor) {
             }
             polyfillClipboardData.setData(copyType, copyData);
 
+            console.log(copyData)
+
             wickEditor.syncInterfaces();
         });
 

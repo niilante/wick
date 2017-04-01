@@ -206,9 +206,18 @@ var InputHandler = function (wickEditor) {
         wickEditor.guiActionHandler.specialKeys = [];
         
         var clipboardData = event.clipboardData;
+
         if (clipboardEvent == 'cut' || clipboardEvent == 'copy') {
-            clipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
-            //clipboardData.setData('text/html', htmlToCopy);
+            //clipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
+            
+            var copyData = wickEditor.project.getCopyData();
+            var copyType;
+            if(wickEditor.project.getSelectedObjects()[0] instanceof WickObject) {
+                copyType = 'text/wickobjectsjson';
+            } else {
+                copyType = 'text/wickframesjson';
+            }
+            clipboardData.setData(copyType, copyData);
         }
         if (clipboardEvent == 'paste') {
             //console.log('Clipboard Plain Text: ' + clipboardData.getData('text/plain'));

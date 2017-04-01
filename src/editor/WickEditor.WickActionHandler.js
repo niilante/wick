@@ -536,6 +536,10 @@ var WickActionHandler = function (wickEditor) {
             args.frames.forEach(function (frame) {
                 currentObject.layers[0].frames.push(frame);
             });
+
+            currentObject.framesDirty = true;
+
+            done();
         },
         function (args) {
             
