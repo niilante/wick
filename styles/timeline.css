@@ -168,6 +168,7 @@ body {
 	box-shadow: var(--border);
 
 	font-size: 12px;
+    font-family: "Anonymous Pro"
 }
 
 .active-layer {
@@ -444,8 +445,9 @@ body {
 	position: absolute;
 	height: var(--number-line-height);
     color: #fafafa;
-    font-size: 1.5vmin;
-    font: "Anonymous Pro"
+    font-size: vmin;
+    font-family: "Anonymous Pro" ;
+    margin-top: 3px;
 }
 
 @font-face {
