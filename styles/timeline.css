@@ -20,10 +20,10 @@ body {
 
 	--common-padding: 4px;
     
-    --max-timeline-height: 200px; 
+    --max-timeline-height: 150px; 
 
 	--layers-width: 150px;
-	--layer-height: 46px;
+	--layer-height: 40px;
 
 	--frame-width: 80px;
 	--frame-handle-width: 8px;
@@ -45,7 +45,7 @@ body {
     --scrollbar-thickness: 18px;
 
 
-    --number-line-height: 23px;
+    --number-line-height: 20px;
 }
 
 .timeline {
@@ -87,7 +87,7 @@ body {
 
 .layer-tools-button {
 	position: absolute;
-
+    
 	top: 0px;
 	left: 0px;
 
@@ -104,21 +104,41 @@ body {
 }
 
 .delete-layer-button {
+    position: relative;
 	left: calc(var(--scrollbar-thickness) + 5px);
     background-image: url("/resources/minusButton.svg");
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: left;
+    text-overflow: clip;
+    overflow: hidden;
     background-size: 12px 12px;
+    transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));
+/*    clip: rect(10px, 20px, 30px, 40px);*/
+/*    display: inline;*/
+    z-index: 1;
+
     
 }
 
+.delete-layer-button:hover {
+    width: 100px;
+}
 .add-layer-button {
     background-image: url(/resources/plusButton.svg);
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: left;
     background-size: 12px 12px;
+    background-size: 12px 12px;
+    transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));
+    z-index: 2;
 }
 
+.add-layer-button:hover {
+    width: 100px;
+    z-index: 2;
+}
 
 
 .layer {
@@ -424,7 +444,15 @@ body {
 	position: absolute;
 	height: var(--number-line-height);
     color: #fafafa;
+    font-size: 1.5vmin;
+    font: "Anonymous Pro"
 }
+
+@font-face {
+    font-family: myFirstFont;
+    src: url(sansation_light.woff);
+}
+
 
 .playrange {
 	cursor: move;
