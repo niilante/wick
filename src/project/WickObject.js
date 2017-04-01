@@ -308,6 +308,7 @@ WickObject.prototype.getAsJSON = function () {
     this.encodeStrings();
 
     var dontJSONVars = [
+        "thumbnail",
         "cachedImageData",
         "fabricObjectReference",
         "parentObject",

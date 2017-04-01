@@ -128,6 +128,7 @@ WickProject.Exporter = (function () {
 
     projectExporter.JSONReplacer = function(key, value) {
         var dontJSONVars = [
+            "thumbnail",
             "currentObject",
             "parentObject",
             "causedAnException",

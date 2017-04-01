@@ -208,7 +208,7 @@ WickFrame.prototype.getAsJSON = function () {
         wickObject.encodeStrings();
     });
 
-    var dontJSONVars = ["cachedImageData","fabricObjectReference","parentObject","parentWickObject","parentLayer","parentFrame","causedAnException","uuid"];
+    var dontJSONVars = ["thumbnail","cachedImageData","fabricObjectReference","parentObject","parentWickObject","parentLayer","parentFrame","causedAnException","uuid"];
 
     var frameJSON = JSON.stringify(this, function(key, value) {
         if (dontJSONVars.indexOf(key) !== -1) {

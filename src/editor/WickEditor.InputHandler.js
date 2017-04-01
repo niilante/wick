@@ -360,6 +360,7 @@ var InputHandler = function (wickEditor) {
             
             wickEditor.project = WickProject.fromJSON(json);
             window.wickRenderer.setProject(wickEditor.project);
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
             wickEditor.syncInterfaces();
 
         } else {
@@ -433,19 +434,6 @@ var InputHandler = function (wickEditor) {
                 newWickObject.x = m.x;
                 newWickObject.y = m.y;
                 wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
-
-                // Generate thumbnails for gif frames inside new symbol
-                if(fileType === 'image/gif') {
-                    var oldCurr = wickEditor.project.currentObject;
-                    wickEditor.project.currentObject = newWickObject
-                    newWickObject.getAllFrames().forEach(function (frame) {
-                        console.log(frame)
-                        wickEditor.project.currentObject.playheadPosition = frame.playheadPosition
-                        wickEditor.thumbnailRenderer.renderThumbnailForFrame(frame)
-                    });
-                    wickEditor.project.currentObject = oldCurr;
-                    newWickObject.playheadPosition = 0;
-                }
             })
         };
         if(fileType === "application/json" || fileType === "image/svg+xml") 

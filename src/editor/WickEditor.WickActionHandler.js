@@ -886,6 +886,8 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.currentObject = args.objectToEdit;
             wickEditor.project.currentObject.currentFrame = 0;
 
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
+
             done();
         },
         function (args) {
@@ -903,6 +905,8 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.currentObject.playheadPosition = 0;
             args.prevEditedObject = wickEditor.project.currentObject;
             wickEditor.project.currentObject = wickEditor.project.currentObject.parentObject;
+
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
 
             done();
         },
