@@ -27,7 +27,6 @@ var ThumbnailRendererInterface = function (wickEditor) {
         /*thumbpreview = document.createElement('div')
         thumbpreview.className = 'thumbnailPreview';
         //document.body.appendChild(thumbpreview)
-        wickEditor.project.fitScreen = false;
 
         thumbRenderer = new WickPixiRenderer(wickEditor.project, thumbpreview, 0.2);
         thumbRenderer.setup();*/
@@ -65,6 +64,16 @@ var ThumbnailRendererInterface = function (wickEditor) {
             wickEditor.timeline.syncWithEditorState()
         }, 100)
 
+    }
+
+    this.renderAllThumbsOnTimeline = function () {
+        var oldCurr = wickEditor.project.currentObject;
+        wickEditor.project.currentObject.getAllFrames().forEach(function (frame) {
+            wickEditor.project.currentObject.playheadPosition = frame.playheadPosition
+            wickEditor.thumbnailRenderer.renderThumbnailForFrame(frame)
+        });
+        wickEditor.project.currentObject = oldCurr;
+        wickEditor.project.currentObject.playheadPosition = 0;
     }
 
     this.cleanup = function () {

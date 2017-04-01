@@ -308,6 +308,7 @@ WickObject.prototype.getAsJSON = function () {
     this.encodeStrings();
 
     var dontJSONVars = [
+        "thumbnail",
         "cachedImageData",
         "fabricObjectReference",
         "parentObject",
@@ -618,8 +619,8 @@ WickObject.prototype.hasTweenAtFrame = function (frame) {
 WickObject.prototype.getFromTween = function () {
     var foundTween = null;
 
-    var relativePlayheadPosition = this.parentObject.getCurrentLayer().getRelativePlayheadPosition(this);
-
+    var relativePlayheadPosition = this.parentObject.playheadPosition - this.parentFrame.playheadPosition;
+    
     var seekPlayheadPosition = relativePlayheadPosition;
     while (!foundTween && seekPlayheadPosition >= 0) {
         this.tweens.forEach(function (tween) {
@@ -636,7 +637,7 @@ WickObject.prototype.getFromTween = function () {
 WickObject.prototype.getToTween = function () {
     var foundTween = null;
 
-    var relativePlayheadPosition = this.parentObject.getRelativePlayheadPosition(this);
+    var relativePlayheadPosition = this.parentObject.playheadPosition - this.parentFrame.playheadPosition;
 
     var seekPlayheadPosition = relativePlayheadPosition;
     var parentFrameLength = this.parentObject.getFrameWithChild(this).length;
@@ -656,8 +657,6 @@ WickObject.prototype.applyTweens = function () {
 
     var that = this;
 
-    if(!this.tweens) this.tweens = []; // Rescue old projects created before tweens came out
-
     if (!this.isRoot && this.tweens.length > 0) {
         if(this.tweens.length === 1) {
             this.tweens[0].applyTweenToWickObject(that);
@@ -670,7 +669,7 @@ WickObject.prototype.applyTweens = function () {
                 var A = tweenFrom.frame;
                 var B = tweenTo.frame;
                 var L = B-A;
-                var P = that.parentObject.getRelativePlayheadPosition(that)-A;
+                var P = (this.parentObject.playheadPosition - this.parentFrame.playheadPosition)-A;
                 var T = P/L;
                 if(B-A === 0) T = 1;
                 
@@ -1084,6 +1083,8 @@ WickObject.prototype.gotoAndPlay = function (frame) {
 
 WickObject.prototype.movePlayheadTo = function (frame) {
 
+    this._forceNewPlayheadPosition = true;
+
     var oldFrame = this.getCurrentLayer().getCurrentFrame();
 
     // Frames are zero-indexed internally but start at one in the editor GUI, so you gotta subtract 1.
@@ -1475,7 +1476,7 @@ WickObject.prototype.tick = function () {
 
     if(this.isButton) {
         this.stop();
-        if(this._wasClicked) {
+        if(this._beingClicked) {
             if(this.getFramesInPlayrange(this.getPlayrangeById('mousedown')).length > 0)
                 this.movePlayheadTo('mousedown');
         } else if (this.hoveredOver) {
@@ -1490,6 +1491,16 @@ WickObject.prototype.tick = function () {
     if(this._wasClicked) {
         (wickEditor || wickPlayer).project.runScript(this, 'mousedown');
         this._wasClicked = false;
+    }
+
+    if(this._wasHoveredOver) {
+        (wickEditor || wickPlayer).project.runScript(this, 'mouseover');
+        this._wasHoveredOver = false;
+    }
+
+    if(this._wasClickedOff) {
+        (wickEditor || wickPlayer).project.runScript(this, 'mouseup');
+        this._wasClickedOff = false;
     }
 
     // Inactive -> Inactive

@@ -420,6 +420,8 @@ var GuiActionHandler = function (wickEditor) {
             }
             polyfillClipboardData.setData(copyType, copyData);
 
+            console.log(copyData)
+
             wickEditor.syncInterfaces();
         });
 
@@ -892,7 +894,7 @@ var GuiActionHandler = function (wickEditor) {
         function(args) {
             var selectedObj = wickEditor.fabric.getSelectedObject(WickObject);
             var tween = WickTween.fromWickObjectState(selectedObj);
-            tween.frame = selectedObj.parentObject.getRelativePlayheadPosition(selectedObj);
+            tween.frame = wickEditor.project.getCurrentObject().playheadPosition;
             selectedObj.addTween(tween);
             wickEditor.syncInterfaces();
         });

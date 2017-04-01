@@ -206,9 +206,18 @@ var InputHandler = function (wickEditor) {
         wickEditor.guiActionHandler.specialKeys = [];
         
         var clipboardData = event.clipboardData;
+
         if (clipboardEvent == 'cut' || clipboardEvent == 'copy') {
-            clipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
-            //clipboardData.setData('text/html', htmlToCopy);
+            //clipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
+            
+            var copyData = wickEditor.project.getCopyData();
+            var copyType;
+            if(wickEditor.project.getSelectedObjects()[0] instanceof WickObject) {
+                copyType = 'text/wickobjectsjson';
+            } else {
+                copyType = 'text/wickframesjson';
+            }
+            clipboardData.setData(copyType, copyData);
         }
         if (clipboardEvent == 'paste') {
             //console.log('Clipboard Plain Text: ' + clipboardData.getData('text/plain'));
@@ -351,6 +360,7 @@ var InputHandler = function (wickEditor) {
             
             wickEditor.project = WickProject.fromJSON(json);
             window.wickRenderer.setProject(wickEditor.project);
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
             wickEditor.syncInterfaces();
 
         } else {
@@ -424,19 +434,6 @@ var InputHandler = function (wickEditor) {
                 newWickObject.x = m.x;
                 newWickObject.y = m.y;
                 wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
-
-                // Generate thumbnails for gif frames inside new symbol
-                if(fileType === 'image/gif') {
-                    var oldCurr = wickEditor.project.currentObject;
-                    wickEditor.project.currentObject = newWickObject
-                    newWickObject.getAllFrames().forEach(function (frame) {
-                        console.log(frame)
-                        wickEditor.project.currentObject.playheadPosition = frame.playheadPosition
-                        wickEditor.thumbnailRenderer.renderThumbnailForFrame(frame)
-                    });
-                    wickEditor.project.currentObject = oldCurr;
-                    newWickObject.playheadPosition = 0;
-                }
             })
         };
         if(fileType === "application/json" || fileType === "image/svg+xml") 

@@ -47,6 +47,7 @@ WickProject.Exporter = (function () {
             "lib/Tween.js",
             "lib/lerp.js",
             "lib/bowser.js",
+            "lib/howler.min.js",
             "lib/URLParameterUtils.js",
             "src/project/WickTween.js",
             "src/project/WickFrame.js",
@@ -127,6 +128,7 @@ WickProject.Exporter = (function () {
 
     projectExporter.JSONReplacer = function(key, value) {
         var dontJSONVars = [
+            "thumbnail",
             "currentObject",
             "parentObject",
             "causedAnException",

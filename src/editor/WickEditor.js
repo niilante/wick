@@ -89,6 +89,7 @@ var WickEditor = function () {
         window.wickRenderer = new WickPixiRenderer();
         window.wickRenderer.setProject(that.project);
         window.wickRenderer.setup();
+        that.thumbnailRenderer.renderAllThumbsOnTimeline();
     }
 
     this.syncInterfaces();

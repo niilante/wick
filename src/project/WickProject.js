@@ -552,7 +552,7 @@ var WickObjectBuiltins = [
     'update',
     'mousedown',
     'mouseover',
-    'mouseout'
+    'mouseup'
 ];
 
 WickProject.prototype.loadScriptOfObject = function (obj) {
@@ -562,7 +562,7 @@ WickProject.prototype.loadScriptOfObject = function (obj) {
         var update = undefined;
         var mousedown = undefined;
         var mouseover = undefined;
-        var mouseout = undefined;
+        var mouseup = undefined;
         obj._scopeWrapper = function () {
             var dummyLoaderScript = "";
             WickObjectBuiltins.forEach(function (builtinName) {
@@ -584,7 +584,30 @@ WickProject.prototype.loadScriptOfObject = function (obj) {
             }
         })
     } catch (e) { 
-        console.log(e) 
+        if (window.wickEditor) {
+            //if(!wickEditor.builtinplayer.running) return;
+
+            console.error("Exception thrown while running script of WickObject: " + obj.name);
+            console.error(e);
+            var lineNumber = null;
+            if(e.stack) {
+                e.stack.split('\n').forEach(function (line) {
+                    if(lineNumber) return;
+                    if(!line.includes("<anonymous>:")) return;
+
+                    lineNumber = parseInt(line.split("<anonymous>:")[1].split(":")[0]);
+                });
+            }
+
+            //console.log(e.stack.split("\n")[1].split('<anonymous>:')[1].split(":")[0]);
+            //console.log(e.stack.split("\n"))
+            if(wickEditor.builtinplayer.running) wickEditor.builtinplayer.stopRunningProject()
+            wickEditor.scriptingide.showError(obj, lineNumber, e);
+
+        } else {
+            alert("An exception was thrown while running a WickObject script. See console!");
+            console.log(e);
+        }
     };
 }
 
@@ -597,10 +620,18 @@ WickProject.prototype.prepareForPlayer = function () {
 }
 
 WickProject.prototype.tick = function () {
+    this.rootObject.applyTweens();
+
     var allObjectsInProject = this.rootObject.getAllChildObjectsRecursive();
 
     allObjectsInProject.forEach(function (obj) {
+        if(obj._newPlayheadPosition !== undefined)
+            obj.playheadPosition = obj._newPlayheadPosition;
+    });
+
+    allObjectsInProject.forEach(function (obj) {
         obj._newPlayheadPosition = undefined;
+        obj._forceNewPlayheadPosition = undefined;
 
         obj.getAllFrames().forEach(function (frame) {
             frame._wasActiveLastTick = frame._active;
@@ -612,9 +643,9 @@ WickProject.prototype.tick = function () {
     });
     
     this.rootObject.tick();
-
+    
     allObjectsInProject.forEach(function (obj) {
-        if(obj._newPlayheadPosition !== undefined)
+        if(obj._newPlayheadPosition !== undefined && obj._forceNewPlayheadPosition)
             obj.playheadPosition = obj._newPlayheadPosition;
     });
 }

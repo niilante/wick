@@ -346,7 +346,7 @@ var WickActionHandler = function (wickEditor) {
                 // This is silly what's a better way ???
                 if(wickObj.tweens.length > 0) {
                     var tween = WickTween.fromWickObjectState(wickObj);
-                    tween.frame = wickObj.parentObject.getRelativePlayheadPosition(wickObj);
+                    tween.frame = wickEditor.project.getCurrentObject().playheadPosition;
                     wickObj.addTween(tween);
                 }
             };
@@ -536,6 +536,10 @@ var WickActionHandler = function (wickEditor) {
             args.frames.forEach(function (frame) {
                 currentObject.layers[0].frames.push(frame);
             });
+
+            currentObject.framesDirty = true;
+
+            done();
         },
         function (args) {
             
@@ -882,6 +886,8 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.currentObject = args.objectToEdit;
             wickEditor.project.currentObject.currentFrame = 0;
 
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
+
             done();
         },
         function (args) {
@@ -899,6 +905,8 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.currentObject.playheadPosition = 0;
             args.prevEditedObject = wickEditor.project.currentObject;
             wickEditor.project.currentObject = wickEditor.project.currentObject.parentObject;
+
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
 
             done();
         },

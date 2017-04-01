@@ -30,14 +30,9 @@ var WickPlayer = function () {
 
     var initialStateProject;
 
-    var tick;
-
-
     self.runProject = function (projectJSON) {
 
         self.running = true;
-
-        tick = 1;
 
         window.rendererCanvas = document.getElementById('playerCanvasContainer');
         self.canvasContainer = window.rendererCanvas;
