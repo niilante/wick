@@ -1,0 +1,11 @@
+inspector-input-string {
+	position: absolute;
+}
+
+object-name {
+	top: 50px;
+	left: 20px;
+
+	width: 100px;
+	height: 20px;
+}

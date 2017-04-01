@@ -1084,6 +1084,8 @@ WickObject.prototype.gotoAndPlay = function (frame) {
 
 WickObject.prototype.movePlayheadTo = function (frame) {
 
+    this._forceNewPlayheadPosition = true;
+
     var oldFrame = this.getCurrentLayer().getCurrentFrame();
 
     // Frames are zero-indexed internally but start at one in the editor GUI, so you gotta subtract 1.
@@ -1475,7 +1477,7 @@ WickObject.prototype.tick = function () {
 
     if(this.isButton) {
         this.stop();
-        if(this._wasClicked) {
+        if(this._beingClicked) {
             if(this.getFramesInPlayrange(this.getPlayrangeById('mousedown')).length > 0)
                 this.movePlayheadTo('mousedown');
         } else if (this.hoveredOver) {
@@ -1490,6 +1492,16 @@ WickObject.prototype.tick = function () {
     if(this._wasClicked) {
         (wickEditor || wickPlayer).project.runScript(this, 'mousedown');
         this._wasClicked = false;
+    }
+
+    if(this._wasHoveredOver) {
+        (wickEditor || wickPlayer).project.runScript(this, 'mouseover');
+        this._wasHoveredOver = false;
+    }
+
+    if(this._wasClickedOff) {
+        (wickEditor || wickPlayer).project.runScript(this, 'mouseup');
+        this._wasClickedOff = false;
     }
 
     // Inactive -> Inactive

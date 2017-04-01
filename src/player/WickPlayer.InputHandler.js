@@ -48,6 +48,7 @@ WickPlayerInputHandler = function (wickPlayer) {
         } else {
             canvasContainer.addEventListener('mousemove', onMouseMove, false);
             canvasContainer.addEventListener("mousedown", onMouseDown, false);
+            canvasContainer.addEventListener("mouseup",   onMouseUp,   false);
 
             canvasContainer.addEventListener("keydown", onKeyDown);
             canvasContainer.addEventListener("keyup", onKeyUp);
@@ -60,6 +61,9 @@ WickPlayerInputHandler = function (wickPlayer) {
 
     self.cleanup = function () {
         canvasContainer.removeEventListener("mousedown", onMouseDown);
+        canvasContainer.removeEventListener("mousemove", onMouseMove);
+        canvasContainer.removeEventListener("mouseup", onMouseUp);
+
         canvasContainer.removeEventListener("touchstart", onTouchStart);
         canvasContainer.removeEventListener("touchmove", onTouchMove);
 
@@ -104,6 +108,9 @@ WickPlayerInputHandler = function (wickPlayer) {
         var hoveredOverObj = null;
         project.rootObject.getAllActiveChildObjectsRecursive(true).forEachBackwards(function(child) {
             if(child.isPointInside(mouse)) {
+                if(!child.hoveredOver) {
+                    child._wasHoveredOver = true;
+                }
                 child.hoveredOver = true;
                 hoveredOverObj = child;
             } else {
@@ -126,9 +133,20 @@ WickPlayerInputHandler = function (wickPlayer) {
             if(child.isPointInside(mouse)) {
                 //project.runScript(child, "onClick");
                 child._wasClicked = true;
+                child._beingClicked = true;
             }
         });
 
+    }
+
+    var onMouseUp = function (evt) {
+        project.rootObject.getAllActiveChildObjectsRecursive(true).forEachBackwards(function(child) {
+            child._beingClicked = false;
+
+            if(child.isPointInside(mouse)) {
+                child._wasClickedOff = true;
+            }
+        });
     }
 
     var onKeyDown = function (event) {

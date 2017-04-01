@@ -39,8 +39,6 @@ var GIFRendererInterface = function (wickEditor) {
 
         gifRenderer = window.wickRenderer;
 
-        wickEditor.project.fitScreen = false;
-
         var gifFrameDataURLs = [];
 
         wickEditor.project.currentObject = wickEditor.project.rootObject;

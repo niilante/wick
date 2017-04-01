@@ -76,7 +76,6 @@ WickFrame.prototype.tick = function () {
     });
 }
 
-
 WickFrame.prototype.isActive = function () {
     var parent = this.parentLayer.parentWickObject;
 
@@ -91,6 +90,10 @@ WickFrame.prototype.isActive = function () {
     return parent.playheadPosition >= this.playheadPosition
         && parent.playheadPosition < this.playheadPosition+this.length
         && parent.isActive();
+}
+
+WickFrame.prototype.hasScript = function () {
+    return this.wickScript !== "";
 }
 
 // Extend our frame to encompass more frames. 
@@ -205,7 +208,7 @@ WickFrame.prototype.getAsJSON = function () {
         wickObject.encodeStrings();
     });
 
-    var dontJSONVars = ["cachedImageData","fabricObjectReference","parentObject","causedAnException","uuid"];
+    var dontJSONVars = ["cachedImageData","fabricObjectReference","parentObject","parentWickObject","parentLayer","parentFrame","causedAnException","uuid"];
 
     var frameJSON = JSON.stringify(this, function(key, value) {
         if (dontJSONVars.indexOf(key) !== -1) {
@@ -234,4 +237,14 @@ WickFrame.fromJSON = function (frameJSON) {
     return frame;
 }
 
+WickFrame.fromJSONArray = function (jsonArrayObject) {
+    var frames = [];
 
+    var framesJSONArray = jsonArrayObject.wickObjectArray;
+    framesJSONArray.forEach(function (frameJSON) {
+        var newframe = WickFrame.fromJSON(frameJSON)
+        frames.push(newframe)
+    });
+
+    return frames;
+}

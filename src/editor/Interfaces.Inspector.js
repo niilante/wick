@@ -23,19 +23,18 @@ var InspectorInterface = function (wickEditor) {
     var StringInput = function (className, getValueFn, onChangeFn) {
 
         var self = this;
-        var elem = document.createElement('input');
-        elem.class = 'inspector-string-input ' + className;
+        self.getValueFn = getValueFn;
+        self.onChangeFn = onChangeFn;
 
         self.sync = function () {
             elem.value = self.getValueFn();
         }
+
+        var elem = document.createElement('input');
+        elem.class = 'inspector-string-input ' + className;
         elem.onchange = function (e) {
             self.onChangeFn(e.val);
         }
-
-        self.getValueFn = getValueFn;
-        self.onChangeFn = onChangeFn;
-
         inspectorDiv.addChild(elem);
 
     }
