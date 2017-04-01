@@ -47,6 +47,7 @@ WickProject.Exporter = (function () {
             "lib/Tween.js",
             "lib/lerp.js",
             "lib/bowser.js",
+            "lib/howler.min.js",
             "lib/URLParameterUtils.js",
             "src/project/WickTween.js",
             "src/project/WickFrame.js",

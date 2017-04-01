@@ -657,8 +657,6 @@ WickObject.prototype.applyTweens = function () {
     var that = this;
 
     if (!this.isRoot && this.tweens.length > 0) {
-        console.log(this.tweens)
-
         if(this.tweens.length === 1) {
             this.tweens[0].applyTweenToWickObject(that);
         } else {
