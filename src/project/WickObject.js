@@ -618,8 +618,8 @@ WickObject.prototype.hasTweenAtFrame = function (frame) {
 WickObject.prototype.getFromTween = function () {
     var foundTween = null;
 
-    var relativePlayheadPosition = this.parentObject.getCurrentLayer().getRelativePlayheadPosition(this);
-
+    var relativePlayheadPosition = this.parentObject.playheadPosition - this.parentFrame.playheadPosition;
+    
     var seekPlayheadPosition = relativePlayheadPosition;
     while (!foundTween && seekPlayheadPosition >= 0) {
         this.tweens.forEach(function (tween) {
@@ -636,11 +636,12 @@ WickObject.prototype.getFromTween = function () {
 WickObject.prototype.getToTween = function () {
     var foundTween = null;
 
-    var relativePlayheadPosition = this.parentObject.getRelativePlayheadPosition(this);
+    var relativePlayheadPosition = this.parentObject.playheadPosition - this.parentFrame.playheadPosition;
 
     var seekPlayheadPosition = relativePlayheadPosition;
     var parentFrameLength = this.parentObject.getFrameWithChild(this).length;
     while (!foundTween && seekPlayheadPosition < parentFrameLength) {
+        console.log(seekPlayheadPosition)
         this.tweens.forEach(function (tween) {
             if(tween.frame === seekPlayheadPosition) {
                 foundTween = tween;
@@ -656,21 +657,24 @@ WickObject.prototype.applyTweens = function () {
 
     var that = this;
 
-    if(!this.tweens) this.tweens = []; // Rescue old projects created before tweens came out
-
     if (!this.isRoot && this.tweens.length > 0) {
+        console.log(this.tweens)
+
         if(this.tweens.length === 1) {
             this.tweens[0].applyTweenToWickObject(that);
         } else {
             var tweenFrom = that.getFromTween();
             var tweenTo = that.getToTween();
 
+            console.log(tweenFrom)
+            console.log(tweenTo)
+
             if (tweenFrom && tweenTo) {
                 // yuck
                 var A = tweenFrom.frame;
                 var B = tweenTo.frame;
                 var L = B-A;
-                var P = that.parentObject.getRelativePlayheadPosition(that)-A;
+                var P = (this.parentObject.playheadPosition - this.parentFrame.playheadPosition)-A;
                 var T = P/L;
                 if(B-A === 0) T = 1;
                 

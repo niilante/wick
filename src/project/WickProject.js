@@ -620,6 +620,8 @@ WickProject.prototype.prepareForPlayer = function () {
 }
 
 WickProject.prototype.tick = function () {
+    this.rootObject.applyTweens();
+
     var allObjectsInProject = this.rootObject.getAllChildObjectsRecursive();
 
     allObjectsInProject.forEach(function (obj) {
