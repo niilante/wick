@@ -641,7 +641,6 @@ WickObject.prototype.getToTween = function () {
     var seekPlayheadPosition = relativePlayheadPosition;
     var parentFrameLength = this.parentObject.getFrameWithChild(this).length;
     while (!foundTween && seekPlayheadPosition < parentFrameLength) {
-        console.log(seekPlayheadPosition)
         this.tweens.forEach(function (tween) {
             if(tween.frame === seekPlayheadPosition) {
                 foundTween = tween;
@@ -665,9 +664,6 @@ WickObject.prototype.applyTweens = function () {
         } else {
             var tweenFrom = that.getFromTween();
             var tweenTo = that.getToTween();
-
-            console.log(tweenFrom)
-            console.log(tweenTo)
 
             if (tweenFrom && tweenTo) {
                 // yuck
