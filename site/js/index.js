@@ -12,24 +12,34 @@ $(document).ready(function() {
         window.location.hash = ""
     });
 
-    $( "#gallery-button" ).click(function() {
-        frame.src = "site/pages/gallery.html"
-        window.location.hash = "gallery"
+    $( ".create-button" ).click(function() {
+        frame.src = "site/pages/create.html"
+        window.location.hash = "create"
     });
 
-    $( "#tutorials-button" ).click(function() {
-        frame.src = "site/pages/tutorials.html"
-        window.location.hash = "tutorials"
+    $( ".explore-button" ).click(function() {
+        frame.src = "site/pages/explore.html"
+        window.location.hash = "explore"
     });
 
-    $( "#reference-button" ).click(function() {
+    $( ".learn-button" ).click(function() {
+        frame.src = "site/pages/learn.html"
+        window.location.hash = "learn"
+    });
+
+    $( ".reference-button" ).click(function() {
         frame.src = "site/pages/reference.html"
         window.location.hash = "reference"
     });
 
-    $( "#about-button" ).click(function() {
+    $( ".about-button" ).click(function() {
         frame.src = "site/pages/about.html"
         window.location.hash = "about"
+    });
+
+    $( ".community-button" ).click(function() {
+        frame.src = "site/pages/community.html"
+        window.location.hash = "community"
     });
 
 });
