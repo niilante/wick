@@ -64,7 +64,6 @@ var FabricInterface = function (wickEditor) {
             }
             
             wickEditor.scriptingide.syncWithEditorState();
-            wickEditor.properties.syncWithEditorState();
             wickEditor.timeline.syncWithEditorState();
             /*e.target.on({
                 moving: e.target.setCoords,
@@ -81,7 +80,7 @@ var FabricInterface = function (wickEditor) {
             wickEditor.project.deselectObjectType(WickFrame);
             
             wickEditor.scriptingide.syncWithEditorState();
-            wickEditor.properties.syncWithEditorState();
+            wickEditor.inspector.syncWithEditorState();
         });
         self.canvas.on('selection:changed', function (e) {
             //wickEditor.timeline.redraw();
@@ -89,7 +88,7 @@ var FabricInterface = function (wickEditor) {
 
             self.guiElements.update();
             wickEditor.scriptingide.syncWithEditorState();
-            wickEditor.properties.syncWithEditorState();
+            wickEditor.inspector.syncWithEditorState();
         });
 
         // Listen for objects being changed so we can undo them in the action handler.
@@ -98,9 +97,6 @@ var FabricInterface = function (wickEditor) {
         });
 
         self.canvas.on('mouse:down', function (e) {
-            // quick fix for properties GUI closing after selected wick object changes
-            $(":focus").blur();
-            
             if(wickEditor.project.deselectObjectType(WickFrame) || 
                wickEditor.project.deselectObjectType(WickPlayRange)) {
                 wickEditor.syncInterfaces();
@@ -306,7 +302,6 @@ var FabricInterface = function (wickEditor) {
 
         self.guiElements.update();
         wickEditor.scriptingide.syncWithEditorState();
-        wickEditor.properties.syncWithEditorState();
 
     }
 
@@ -341,7 +336,6 @@ var FabricInterface = function (wickEditor) {
 
         self.guiElements.update();
         wickEditor.scriptingide.syncWithEditorState();
-        wickEditor.properties.syncWithEditorState();
     }
 
     this.getSelectedObjects = function () {

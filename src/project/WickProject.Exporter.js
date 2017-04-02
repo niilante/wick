@@ -32,7 +32,7 @@ WickProject.Exporter = (function () {
 
         // All libs needed by the player. 
         var requiredLibFiles = [
-            "lib/jquery.min.js",
+            /*"lib/jquery.min.js",*/
             "lib/pixi.4.2.2.min.js",
             "lib/lz-string.min.js",
             "lib/screenfull.js",
@@ -43,7 +43,7 @@ WickProject.Exporter = (function () {
             "lib/checkInput.js",
             "lib/canvasutils.js",
             "lib/random.js",
-            "lib/socket.io-1.2.0.js",
+            /*"lib/socket.io-1.2.0.js",*/
             "lib/Tween.js",
             "lib/lerp.js",
             "lib/bowser.js",
@@ -67,6 +67,10 @@ WickProject.Exporter = (function () {
         requiredLibFiles.forEach(function (filename) {
             var script = FileDownloader.downloadFile(filename);
             console.log(script.length + " used for " + filename);
+
+            //var scriptCompressed = LZString.compressToBase64(script)
+            //console.log(scriptCompressed.length + " compressed: " + filename);
+
             totalSize += script.length;
             fileOut += "<script>" + script + "</script>\n";
         });

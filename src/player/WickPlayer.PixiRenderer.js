@@ -65,7 +65,7 @@ var WickPixiRenderer = function () {
         renderer.clearBeforeRender = false;
         renderer.roundPixels = project.pixelPerfectRendering;
         renderer.view.setAttribute('tabindex', 0);
-        $(renderer.view).click(function() { this.focus(); });
+        /*$(renderer.view).click(function() { this.focus(); });*/
 
 
         // Add renderer canvas
@@ -89,13 +89,13 @@ var WickPixiRenderer = function () {
             if(project.borderColor) document.body.style.backgroundColor = project.borderColor;
         }
         // Fix focus issues
-        self.rendererView.className = ''
+        /*self.rendererView.className = ''
         setTimeout(function () {
             $('#rendererCanvas').focus();
         }, 100);
         $(document).on('focus', 'input[readonly]', function () {
             this.blur();
-        });
+        });*/
 
     }
 

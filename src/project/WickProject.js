@@ -470,12 +470,11 @@ WickProject.prototype.getSelectedObjects = function () {
 }
 
 WickProject.prototype.getNumSelectedObjects = function (obj) {
-    return(this._selection.length);
+    return this._selection.length;
 }
 
 WickProject.prototype.selectObject = function (obj) {
     this._selection.push(obj.uuid);
-    wickEditor.properties.setTab('selection')
 }
 
 WickProject.prototype.clearSelection = function () {

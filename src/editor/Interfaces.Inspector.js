@@ -35,12 +35,12 @@ var InspectorInterface = function (wickEditor) {
         elem.onchange = function (e) {
             self.onChangeFn(e.val);
         }
-        inspectorDiv.addChild(elem);
+        inspectorDiv.appendChild(elem);
 
     }
 
     this.setup = function () {
-        inspectorDiv = document.getElementById('inspector');
+        inspectorDiv = document.getElementById('inspectorGUI');
         inputs = [];
 
         inputs.push(new StringInput(
@@ -56,7 +56,7 @@ var InspectorInterface = function (wickEditor) {
 
     this.syncWithEditorState = function () {
         inputs.forEach(function (input) {
-            input.sync();
+            //input.sync();
         });
     }
 
