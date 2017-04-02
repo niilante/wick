@@ -624,6 +624,8 @@ WickProject.prototype.tick = function () {
 
     var allObjectsInProject = this.rootObject.getAllChildObjectsRecursive();
 
+    // Make sure all playhead positions are up to date 
+    // (this is deferred to outside the main tick code so things don't get confusing)
     allObjectsInProject.forEach(function (obj) {
         if(obj._newPlayheadPosition !== undefined)
             obj.playheadPosition = obj._newPlayheadPosition;
@@ -644,6 +646,8 @@ WickProject.prototype.tick = function () {
     
     this.rootObject.tick();
     
+    // If a playhead position was changed through a script, make sure the 
+    // change is reflected on next render (things look more responsive)
     allObjectsInProject.forEach(function (obj) {
         if(obj._newPlayheadPosition !== undefined && obj._forceNewPlayheadPosition)
             obj.playheadPosition = obj._newPlayheadPosition;

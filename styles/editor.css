@@ -120,6 +120,7 @@ select {
 	border-top:none;
     text-align: left;
     text-indent: 5px;
+    z-index: 3;
 }
 
 .menubarButton {
