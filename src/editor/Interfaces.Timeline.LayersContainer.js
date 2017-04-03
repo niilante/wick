@@ -19,7 +19,7 @@ TimelineInterface.LayersContainer = function (wickEditor, timeline) {
 
         var wickLayers = wickEditor.project.currentObject.layers;
         wickLayers.forEach(function (wickLayer) {
-            var layer = new TimelineInterface.Layer(wickEditor, this);
+            var layer = new TimelineInterface.Layer(wickEditor, timeline);
 
             layer.wickLayer = wickLayer;
             layer.build();
