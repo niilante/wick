@@ -335,7 +335,7 @@
       "name": "Utilities",
       "properties": [
         {
-          "name": "random.bool(min,max)",
+          "name": "random.bool()",
           "description": "Generates a random boolean (a value that can be either true or false). See <a target='_parent' href='https://github.com/ckknight/random-js'>this page</a> for more info.",
           "example": "// Use randomBool to simulate a coin flip.\nvar coinFlip = random.bool();\nif(coinFlip == true) {\n\talert('You&#8217;re lucky!!');\n}",
           "return": {
