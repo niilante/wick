@@ -208,15 +208,7 @@ WickFrame.prototype.getAsJSON = function () {
         wickObject.encodeStrings();
     });
 
-    var dontJSONVars = ["thumbnail","cachedImageData","fabricObjectReference","parentObject","parentWickObject","parentLayer","parentFrame","causedAnException","uuid"];
-
-    var frameJSON = JSON.stringify(this, function(key, value) {
-        if (dontJSONVars.indexOf(key) !== -1) {
-            return undefined;
-        } else {
-            return value;
-        }
-    });
+    var frameJSON = JSON.stringify(this, WickProject.Exporter.JSONReplacerObject);
 
     this.wickObjects.forEach(function (wickObject) {
         wickObject.decodeStrings();

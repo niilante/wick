@@ -19,6 +19,7 @@
 /* Only add routines to WickActionHandler if they:
      (1) Change the state of the project and
      (2) Can be undone/redone */
+
 var WickActionHandler = function (wickEditor) {
 
     var self = this;
@@ -223,7 +224,7 @@ var WickActionHandler = function (wickEditor) {
                 wickEditor.actionHandler.doAction('addNewFrame');
             }
             var currentFrame = wickEditor.project.getCurrentFrame();
-
+            
             // Save references to added wick objects so they can be removed on undo
             args.addedObjects = [];
             args.wickObjects.forEach(function (wickObj) {
@@ -505,7 +506,7 @@ var WickActionHandler = function (wickEditor) {
                 scrap(true); return;
             }
 
-            // Add an empty frame
+            // Add frame
             args.layer.addFrame(args.frame);
 
             // Move to that new frame
@@ -946,6 +947,63 @@ var WickActionHandler = function (wickEditor) {
                 wickEditor.project.currentObject.removeChild(args.objs[i]);
                 wickEditor.project.getCurrentFrame().wickObjects.splice(args.oldZIndexes[i], 0, obj);
             }
+
+            done();
+        });
+
+    registerAction('uniteTouchingPaths', 
+        function (args) {
+            startTiming()
+
+            var currObjs = wickEditor.project.getCurrentFrame().wickObjects;
+            var touchingPaths = [];
+            currObjs.forEach(function (obj) {
+                if(!obj.pathData) return;
+                var path = obj;
+
+                touchingPaths.push(path);
+            });
+
+            wickEditor.actionHandler.doAction('deleteObjects', {
+                objects: touchingPaths
+            });
+
+            touchingPaths.forEach(function (path) {
+                if(!path.paper) {
+                    var xmlString = path.pathData
+                      , parser = new DOMParser()
+                      , doc = parser.parseFromString(xmlString, "text/xml");
+
+                    path.paper = paper.project.importSVG(doc);
+                }
+            });
+
+            var superPath = touchingPaths[0].paper.children[0].clone({insert:false});
+            touchingPaths.forEach(function (path) {
+                if(path === touchingPaths[0]) return;
+                if(superPath.closePath) superPath.closePath();
+                superPath = superPath.unite(path.paper.children[0]);
+            });
+
+            var superGroup = new paper.Group();
+            superGroup.addChild(superPath);
+
+            var superPathString = superPath.exportSVG({asString:true});
+            var svgString = '<svg id="svg" version="1.1" width="200" height="200" xmlns="http://www.w3.org/2000/svg">' +superPathString+ '</svg>'
+            var superPathWickObject = WickObject.fromPathFile(svgString);
+            superPathWickObject.x = 0;
+            superPathWickObject.y = 0;
+
+            wickEditor.actionHandler.doAction('addObjects', {
+                wickObjects: [superPathWickObject]
+            });
+
+            done();
+
+            stopTiming("union!")
+        },
+        function (args) {
+
 
             done();
         });

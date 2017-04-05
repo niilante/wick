@@ -307,24 +307,7 @@ WickObject.prototype.getAsJSON = function () {
     // Encode scripts to avoid JSON format problems
     this.encodeStrings();
 
-    var dontJSONVars = [
-        "thumbnail",
-        "cachedImageData",
-        "fabricObjectReference",
-        "parentObject",
-        "causedAnException",
-        "uuid",
-        "parentLayer",
-        "parentWickObject",
-        "parentFrame"
-    ];
-    var JSONWickObject = JSON.stringify(this, function(key, value) {
-        if (dontJSONVars.indexOf(key) !== -1) {
-            return undefined;
-        } else {
-            return value;
-        }
-    });
+    var JSONWickObject = JSON.stringify(this, WickProject.Exporter.JSONReplacerObject);
 
     // Put prototypes back on object ('class methods'), they don't get JSONified on project export.
     WickObject.addPrototypes(this);
@@ -1354,10 +1337,6 @@ WickObject.prototype.setValidator = function (validator) {
     });
 }
 
-/***************************************
-            stuff 2 deprecate
-***************************************/
-
 WickObject.prototype.prepareForPlayer = function () {
     // Set all playhead vars
     if(this.isSymbol) {
@@ -1375,54 +1354,6 @@ WickObject.prototype.prepareForPlayer = function () {
 
     // Reset the mouse hovered over state flag
     this.hoveredOver = false;
-}
-
-WickObject.prototype.autocropImage = function (callback) {
-    var that = this;
-
-    var img = new Image();
-    img.onload = function() {
-        var cropImgData = removeBlankPixels(img, img.width, img.height);
-        var croppedSrc = cropImgData.dataURL;
-        var cropLeft = cropImgData.left;
-        var cropTop = cropImgData.top;
-
-        var autoCroppedImg = new Image();
-        autoCroppedImg.onload = function () {
-
-            /*AddPaddingToImage(autoCroppedImg, function (paddedImgSrc) {
-                var paddedImg = new Image();
-                paddedImg.onload = function () {
-                    that.width  = paddedImg.width;
-                    that.height = paddedImg.height;
-                    that.x += cropLeft + that.width/2;
-                    that.y += cropTop  + that.height/2;
-                    that.imageData = paddedImg.src;
-                    that.imageDirty = true;
-                    callback();
-                }
-                paddedImg.src = paddedImgSrc;
-            });*/
-
-            that.width  = autoCroppedImg.width;
-            that.height = autoCroppedImg.height;
-            that.x += cropLeft + that.width/2;
-            that.y += cropTop  + that.height/2;
-            that.imageData = autoCroppedImg.src;
-            that.imageDirty = true;
-            callback();
-        }
-        autoCroppedImg.src = croppedSrc;
-    }
-    img.src = this.imageData;
-}
-
-WickObject.prototype.getBlobImages = function (callback) {
-    var that = this;
-
-    FindBlobsAndGetBlobImages(this.imageData, function (blobImages) {
-        callback(blobImages);
-    });
 }
 
 /* Generate alpha mask for per-pixel hit detection */
@@ -1557,111 +1488,3 @@ WickObject.prototype.isActive = function () {
     return this.parentFrame.isActive();
 }
 
-/*WickObject.prototype.runScriptFn = function (fnName, objectScope, frame) {
-
-    var that = this;
-
-    if(!objectScope) objectScope = this.parentObject;
-
-    // Setup wickobject reference variables
-    window.project = wickPlayer.project || wickEditor.project;
-    window.root = project.rootObject;
-    window.parent = this.parentObject;
-
-    // Setup builtin wick scripting methods and objects
-    window.play           = function ()      { objectScope.play(); }
-    window.pause          = function ()      { objectScope.pause(); }
-    window.movePlayheadTo = function (frame) { objectScope.movePlayheadTo(frame); }
-
-    // Etc. player wrappers
-    window.stopAllSounds = function () { WickPlayer.getAudioPlayer().stopAllSounds(); };
-    window.keyIsDown = function (keyString) { return wickPlayer.inputHandler.keyIsDown(keyString); };
-    window.keyJustPressed = function (keyString) { return wickPlayer.inputHandler.keyJustPressed(keyString); }
-    window.getMouseX = function () { return WickPlayer.getMouse().x; }
-    window.getMouseY = function () { return WickPlayer.getMouse().y; }
-    window.hideCursor = function () { WickPlayer.hideCursor(); };
-    window.showCursor = function () { WickPlayer.showCursor(); };
-    window.enterFullscreen = function () { WickPlayer.enterFullscreen(); }
-
-    // WickObjects in same frame (scope) are accessable without using root./parent.
-    if(objectScope) {
-        objectScope.getAllChildObjects().forEach(function(child) {
-            if(child.name) window[child.name] = child;
-        });
-    }
-        
-    // Run da script!!
-    try {
-        //eval(script);
-        //eval("try{" + script + "\n}catch (e) { throw (e); }");
-        if(frame) {
-            frame[fnName]();
-        } else {
-            if(this[fnName])  this[fnName]();
-        }
-    } catch (e) {
-        if (window.wickEditor) {
-            //if(!wickEditor.builtinplayer.running) return;
-
-            console.error("Exception thrown while running script of WickObject: " + this.name);
-            console.error(e);
-            var lineNumber = null;
-            if(e.stack) {
-                e.stack.split('\n').forEach(function (line) {
-                    if(lineNumber) return;
-                    if(!line.includes("<anonymous>:")) return;
-
-                    lineNumber = parseInt(line.split("<anonymous>:")[1].split(":")[0]);
-                });
-            }
-
-            //console.log(e.stack.split("\n")[1].split('<anonymous>:')[1].split(":")[0]);
-            //console.log(e.stack.split("\n"))
-            if(wickEditor.builtinplayer.running) wickEditor.builtinplayer.stopRunningProject()
-            wickEditor.scriptingide.showError(frame || this, lineNumber, e);
-
-        } else {
-            alert("An exception was thrown while running a WickObject script. See console!");
-            console.log(e);
-        }
-    }
-    //eval("try{" + script + "}catch (e) { console.log(e); }");
-
-    // Get rid of wickobject reference variables
-    if(!this.isRoot) {
-        this.parentObject.getAllChildObjects().forEach(function(child) {
-            if(child.name) window[child.name] = undefined;
-        });
-    }
-
-}*/
-
-/*WickObject.prototype.advanceTimeline = function () {
-    // Advance timeline for this object
-    if(this.isPlaying && this.readyToAdvance) {
-
-        var oldFrame = this.getCurrentLayer().getCurrentFrame();
-        this.playheadPosition ++;
-
-        // If we reached the end, go back to the beginning
-        if(this.playheadPosition >= this.getTotalTimelineLength()) {
-            this.playheadPosition = 0;
-        }
-
-        var newFrame = this.getCurrentLayer().getCurrentFrame();
-
-        if(oldFrame !== newFrame) {
-            this.onNewFrame = true;
-            if(!newFrame) return;
-            if(!newFrame.alwaysSaveState) {
-                newFrame.wickObjects.forEach(function (child) {
-                    wickPlayer.resetStateOfObject(child);
-                });
-            }
-            this.getAllActiveChildObjects().forEach(function (child) {
-                child.justEnteredFrame = true;
-            });
-        }
-    }
-
-}*/

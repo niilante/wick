@@ -49,6 +49,7 @@ var WickEditor = function () {
     this.toolbar = registerInterface(new ToolbarInterface(this));
     this.inspector = registerInterface(new InspectorInterface(this));
     this.paper = registerInterface(new PaperInterface(this));
+    this.pathRoutines = registerInterface(new PathRountines(this));
     this.fabric = registerInterface(new FabricInterface(this));
     this.menubar = registerInterface(new MenuBarInterface(this));
 

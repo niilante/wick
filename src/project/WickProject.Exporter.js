@@ -130,20 +130,44 @@ WickProject.Exporter = (function () {
 
     }
 
-    projectExporter.JSONReplacer = function(key, value) {
-        var dontJSONVars = [
-            "thumbnail",
-            "currentObject",
-            "parentObject",
-            "causedAnException",
-            "fabricObjectReference",
-            "parentLayer",
-            "parentWickObject",
-            "parentFrame",
-            "alphaMask"
-        ];
+    var dontJSONVars = [
+        "thumbnail",
+        "currentObject",
+        "parentObject",
+        "causedAnException",
+        "fabricObjectReference",
+        "parentLayer",
+        "parentWickObject",
+        "parentFrame",
+        "alphaMask",
+        "thumbnail",
+        "cachedImageData",
+        "fabricObjectReference",
+        "parentObject",
+        "causedAnException",
+        "parentLayer",
+        "parentWickObject",
+        "parentFrame",
+        "thumbnail",
+        "cachedImageData",
+        "fabricObjectReference",
+        "parentObject",
+        "parentWickObject",
+        "parentLayer",
+        "parentFrame",
+        "causedAnException",
+    ];
 
+    projectExporter.JSONReplacer = function(key, value) {
         if (dontJSONVars.indexOf(key) !== -1) {
+            return undefined;
+        } else {
+            return value;
+        }
+    }
+
+    projectExporter.JSONReplacerObject = function (key, value) {
+        if (key === "uuid" || dontJSONVars.indexOf(key) !== -1) {
             return undefined;
         } else {
             return value;

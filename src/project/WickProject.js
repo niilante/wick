@@ -496,6 +496,12 @@ WickProject.prototype.deselectObjectType = function (type) {
     return deselectionHappened;
 }
 
+WickProject.prototype.getIntersectingPaths = function (path) {
+
+    return [];
+
+}
+
 WickProject.prototype.loadBuiltinFunctions = function (contextObject) {
 
     var objectScope = null;
