@@ -1,5 +1,20 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
 var FabricInterface = function (wickEditor) {
 
     var self = this;
@@ -31,7 +46,6 @@ var FabricInterface = function (wickEditor) {
         this.guiElements     = new FabricGUIElements(wickEditor, this);
         this.wickElements    = new FabricWickElements(wickEditor, this);
         this.symbolBorders   = new FabricSymbolBorders(wickEditor, this);
-        this.projectRenderer = new FabricProjectRenderer(wickEditor, this);
 
         this.canvas.freeDrawingBrush = new fabric.PencilBrush(this.canvas);
 
@@ -50,7 +64,6 @@ var FabricInterface = function (wickEditor) {
             }
             
             wickEditor.scriptingide.syncWithEditorState();
-            wickEditor.properties.syncWithEditorState();
             wickEditor.timeline.syncWithEditorState();
             /*e.target.on({
                 moving: e.target.setCoords,
@@ -67,7 +80,7 @@ var FabricInterface = function (wickEditor) {
             wickEditor.project.deselectObjectType(WickFrame);
             
             wickEditor.scriptingide.syncWithEditorState();
-            wickEditor.properties.syncWithEditorState();
+            wickEditor.inspector.syncWithEditorState();
         });
         self.canvas.on('selection:changed', function (e) {
             //wickEditor.timeline.redraw();
@@ -75,7 +88,7 @@ var FabricInterface = function (wickEditor) {
 
             self.guiElements.update();
             wickEditor.scriptingide.syncWithEditorState();
-            wickEditor.properties.syncWithEditorState();
+            wickEditor.inspector.syncWithEditorState();
         });
 
         // Listen for objects being changed so we can undo them in the action handler.
@@ -84,9 +97,6 @@ var FabricInterface = function (wickEditor) {
         });
 
         self.canvas.on('mouse:down', function (e) {
-            // quick fix for properties GUI closing after selected wick object changes
-            $(":focus").blur();
-            
             if(wickEditor.project.deselectObjectType(WickFrame) || 
                wickEditor.project.deselectObjectType(WickPlayRange)) {
                 wickEditor.syncInterfaces();
@@ -292,7 +302,6 @@ var FabricInterface = function (wickEditor) {
 
         self.guiElements.update();
         wickEditor.scriptingide.syncWithEditorState();
-        wickEditor.properties.syncWithEditorState();
 
     }
 
@@ -311,6 +320,12 @@ var FabricInterface = function (wickEditor) {
     }
 
     this.deselectAll = function () {
+        this.canvas._objects.forEach(function(fabricObj) {
+            if(fabricObj.text && fabricObj.isEditing) {
+                fabricObj.exitEditing();
+            }
+        });
+
         var activeGroup = this.canvas.getActiveGroup();
         if(activeGroup) {
             activeGroup.removeWithUpdate(activeGroup);
@@ -321,7 +336,6 @@ var FabricInterface = function (wickEditor) {
 
         self.guiElements.update();
         wickEditor.scriptingide.syncWithEditorState();
-        wickEditor.properties.syncWithEditorState();
     }
 
     this.getSelectedObjects = function () {

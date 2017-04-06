@@ -1,4 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 var InputHandler = function (wickEditor) {
 
@@ -191,9 +206,18 @@ var InputHandler = function (wickEditor) {
         wickEditor.guiActionHandler.specialKeys = [];
         
         var clipboardData = event.clipboardData;
+
         if (clipboardEvent == 'cut' || clipboardEvent == 'copy') {
-            clipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
-            //clipboardData.setData('text/html', htmlToCopy);
+            //clipboardData.setData('text/wickobjectsjson', wickEditor.project.getCopyData());
+            
+            var copyData = wickEditor.project.getCopyData();
+            var copyType;
+            if(wickEditor.project.getSelectedObjects()[0] instanceof WickObject) {
+                copyType = 'text/wickobjectsjson';
+            } else {
+                copyType = 'text/wickframesjson';
+            }
+            clipboardData.setData(copyType, copyData);
         }
         if (clipboardEvent == 'paste') {
             //console.log('Clipboard Plain Text: ' + clipboardData.getData('text/plain'));
@@ -314,6 +338,7 @@ var InputHandler = function (wickEditor) {
 
                 gifSymbol.width = gifWidth;
                 gifSymbol.height = gifHeight;
+
                 callback(gifSymbol);
             }
         }
@@ -330,7 +355,19 @@ var InputHandler = function (wickEditor) {
     }
 
     var loadJSON = function (json, callback) {
-        callback(WickObject.fromJSON(json));
+        var tempJsonObj = JSON.parse(json);
+        if(tempJsonObj.rootObject) {
+            
+            wickEditor.project = WickProject.fromJSON(json);
+            window.wickRenderer.setProject(wickEditor.project);
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
+            wickEditor.syncInterfaces();
+
+        } else {
+
+            callback(WickObject.fromJSON(json));
+
+        }
     }
 
     var loadWAV = function (dataURL, callback) {
@@ -346,60 +383,63 @@ var InputHandler = function (wickEditor) {
         callback(audioWickObject);
     }
 
+    var loadHTML = function (file) {
+        WickProject.fromFile(file, function(project) {
+            wickEditor.project = project;
+            window.wickRenderer.setProject(wickEditor.project);
+            wickEditor.syncInterfaces();
+        });
+    }
+
     var loadFileIntoWickObject = function (e,file,fileType) {
 
-        if (fileType === 'text/html') {
-            WickProject.fromFile(file, function(project) {
-                wickEditor.thumbnailRenderer.cleanup();
-                wickEditor.project = project;
-                wickEditor.syncInterfaces();
-                wickEditor.thumbnailRenderer.setup();
-            });
-        } else {
-
-            var fromContstructors = {
-                'image/png'        : loadImage,
-                'image/jpeg'       : loadImage,
-                'application/jpg'  : loadImage,
-                'image/bmp'        : loadImage,
-                'image/svg+xml'    : loadSVG,
-                'image/gif'        : loadAnimatedGIF,
-                'audio/mp3'        : loadAudio,
-                'audio/wav'        : loadWAV,
-                'audio/wave'       : loadWAV,
-                'audio/x-wav'      : loadWAV,
-                'audio/x-pn-wav'   : loadWAV,
-                'audio/ogg'        : loadAudio,
-                'audio/flac'       : loadAudio,
-                'audio/x-flac'     : loadAudio,
-                "audio/x-m4a"      : loadAudio,
-                "application/json" : loadJSON
-            }
-            
-            var fr = new FileReader();
-            fr.onloadend = function() {
-                if(!fromContstructors[fileType]) { 
-                    console.error(fileType + " has no constructor!");
-                    return;
-                }
-
-                fromContstructors[fileType](fr.result, function (newWickObject) {
-                    var m
-                    if(e && e.originalEvent && e.originalEvent.clientX) {
-                        m = wickEditor.fabric.screenToCanvasSpace(e.originalEvent.clientX, e.originalEvent.clientY);
-                    } else {
-                        m = wickEditor.fabric.screenToCanvasSpace(window.innerWidth/2, window.innerHeight/2);
-                    }
-                    newWickObject.x = m.x;
-                    newWickObject.y = m.y;
-                    wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
-                })
-            };
-            if(fileType === "application/json" || fileType === "image/svg+xml") 
-                fr.readAsText(file); 
-            else 
-                fr.readAsDataURL(file);
+        if(fileType === 'text/html') {
+            loadHTML(file)
+            return;
         }
+
+        var fromContstructors = {
+            'image/png'        : loadImage,
+            'image/jpeg'       : loadImage,
+            'application/jpg'  : loadImage,
+            'image/bmp'        : loadImage,
+            'image/svg+xml'    : loadSVG,
+            'image/gif'        : loadAnimatedGIF,
+            'audio/mp3'        : loadAudio,
+            'audio/wav'        : loadWAV,
+            'audio/wave'       : loadWAV,
+            'audio/x-wav'      : loadWAV,
+            'audio/x-pn-wav'   : loadWAV,
+            'audio/ogg'        : loadAudio,
+            'audio/flac'       : loadAudio,
+            'audio/x-flac'     : loadAudio,
+            "audio/x-m4a"      : loadAudio,
+            "application/json" : loadJSON
+        }
+        
+        var fr = new FileReader();
+        fr.onloadend = function() {
+            if(!fromContstructors[fileType]) { 
+                console.error(fileType + " has no constructor!");
+                return;
+            }
+
+            fromContstructors[fileType](fr.result, function (newWickObject) {
+                var m
+                if(e && e.originalEvent && e.originalEvent.clientX) {
+                    m = wickEditor.fabric.screenToCanvasSpace(e.originalEvent.clientX, e.originalEvent.clientY);
+                } else {
+                    m = wickEditor.fabric.screenToCanvasSpace(window.innerWidth/2, window.innerHeight/2);
+                }
+                newWickObject.x = m.x;
+                newWickObject.y = m.y;
+                wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
+            })
+        };
+        if(fileType === "application/json" || fileType === "image/svg+xml") 
+            fr.readAsText(file); 
+        else 
+            fr.readAsDataURL(file);
     }
 
 /*************************

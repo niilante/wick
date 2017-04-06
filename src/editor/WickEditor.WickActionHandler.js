@@ -1,9 +1,25 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 /* WickActionHandler - General Logic for how undo and redo is handled in the Wick editor. */
 /* Only add routines to WickActionHandler if they:
      (1) Change the state of the project and
      (2) Can be undone/redone */
+
 var WickActionHandler = function (wickEditor) {
 
     var self = this;
@@ -208,7 +224,7 @@ var WickActionHandler = function (wickEditor) {
                 wickEditor.actionHandler.doAction('addNewFrame');
             }
             var currentFrame = wickEditor.project.getCurrentFrame();
-
+            
             // Save references to added wick objects so they can be removed on undo
             args.addedObjects = [];
             args.wickObjects.forEach(function (wickObj) {
@@ -331,7 +347,7 @@ var WickActionHandler = function (wickEditor) {
                 // This is silly what's a better way ???
                 if(wickObj.tweens.length > 0) {
                     var tween = WickTween.fromWickObjectState(wickObj);
-                    tween.frame = wickObj.parentObject.getRelativePlayheadPosition(wickObj);
+                    tween.frame = wickEditor.project.getCurrentObject().playheadPosition;
                     wickObj.addTween(tween);
                 }
             };
@@ -386,6 +402,13 @@ var WickActionHandler = function (wickEditor) {
             symbol.zIndicesDirty = true;
             wickEditor.project.addObject(symbol, symbolZIndex, true);
             args.createdSymbol = symbol;
+
+            if(args.button) {
+                symbol.addPlayRange(new WickPlayRange(0,1,'mouseup'));
+                symbol.addPlayRange(new WickPlayRange(1,2,'mouseover'));
+                symbol.addPlayRange(new WickPlayRange(2,3,'mousedown'));
+                symbol.isButton = true;
+            }
 
             // Remove objects from original parent (they are inside the symbol now.)
             objects.forEach(function (wickObject) {
@@ -483,7 +506,7 @@ var WickActionHandler = function (wickEditor) {
                 scrap(true); return;
             }
 
-            // Add an empty frame
+            // Add frame
             args.layer.addFrame(args.frame);
 
             // Move to that new frame
@@ -506,6 +529,22 @@ var WickActionHandler = function (wickEditor) {
 
             done();
         });
+
+    registerAction('addFrames',
+        function (args) {
+            var currentObject = wickEditor.project.getCurrentObject();
+
+            args.frames.forEach(function (frame) {
+                currentObject.layers[0].frames.push(frame);
+            });
+
+            currentObject.framesDirty = true;
+
+            done();
+        },
+        function (args) {
+            
+        })
 
     registerAction('addNewFrame',
         function (args) {
@@ -848,6 +887,8 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.currentObject = args.objectToEdit;
             wickEditor.project.currentObject.currentFrame = 0;
 
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
+
             done();
         },
         function (args) {
@@ -865,6 +906,8 @@ var WickActionHandler = function (wickEditor) {
             wickEditor.project.currentObject.playheadPosition = 0;
             args.prevEditedObject = wickEditor.project.currentObject;
             wickEditor.project.currentObject = wickEditor.project.currentObject.parentObject;
+
+            wickEditor.thumbnailRenderer.renderAllThumbsOnTimeline();
 
             done();
         },
@@ -904,6 +947,63 @@ var WickActionHandler = function (wickEditor) {
                 wickEditor.project.currentObject.removeChild(args.objs[i]);
                 wickEditor.project.getCurrentFrame().wickObjects.splice(args.oldZIndexes[i], 0, obj);
             }
+
+            done();
+        });
+
+    registerAction('uniteTouchingPaths', 
+        function (args) {
+            startTiming()
+
+            var currObjs = wickEditor.project.getCurrentFrame().wickObjects;
+            var touchingPaths = [];
+            currObjs.forEach(function (obj) {
+                if(!obj.pathData) return;
+                var path = obj;
+
+                touchingPaths.push(path);
+            });
+
+            wickEditor.actionHandler.doAction('deleteObjects', {
+                objects: touchingPaths
+            });
+
+            touchingPaths.forEach(function (path) {
+                if(!path.paper) {
+                    var xmlString = path.pathData
+                      , parser = new DOMParser()
+                      , doc = parser.parseFromString(xmlString, "text/xml");
+
+                    path.paper = paper.project.importSVG(doc);
+                }
+            });
+
+            var superPath = touchingPaths[0].paper.children[0].clone({insert:false});
+            touchingPaths.forEach(function (path) {
+                if(path === touchingPaths[0]) return;
+                if(superPath.closePath) superPath.closePath();
+                superPath = superPath.unite(path.paper.children[0]);
+            });
+
+            var superGroup = new paper.Group();
+            superGroup.addChild(superPath);
+
+            var superPathString = superPath.exportSVG({asString:true});
+            var svgString = '<svg id="svg" version="1.1" width="200" height="200" xmlns="http://www.w3.org/2000/svg">' +superPathString+ '</svg>'
+            var superPathWickObject = WickObject.fromPathFile(svgString);
+            superPathWickObject.x = 0;
+            superPathWickObject.y = 0;
+
+            wickEditor.actionHandler.doAction('addObjects', {
+                wickObjects: [superPathWickObject]
+            });
+
+            done();
+
+            stopTiming("union!")
+        },
+        function (args) {
+
 
             done();
         });

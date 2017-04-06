@@ -1,6 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 var ScriptingIDEInterface = function (wickEditor) {
 
@@ -33,6 +46,8 @@ var ScriptingIDEInterface = function (wickEditor) {
             });
 
             that.aceEditor.getSession().on("changeAnnotation", function(){
+                if(!that.open)return;
+
                 var annot = that.aceEditor.getSession().getAnnotations();
 
                 // Look for errors
@@ -67,6 +82,7 @@ var ScriptingIDEInterface = function (wickEditor) {
             data: {},
             success: function(data) {
                 window.wickDocs = "";
+                if(!data.docs) return;
                 data.docs.forEach(function (doc) {
                     doc.properties.forEach(function (prop) {
                         window.wickDocs += prop.name.split('(')[0] + "|"

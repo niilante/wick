@@ -1,4 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 var WickFrame = function () {
     // Identifier so we can do e.g. movePlayheadTo("menu") 
@@ -26,18 +41,12 @@ var WickFrame = function () {
     this.parentLayer = null;
 
     // Set all scripts to defaults
-    this.wickScript = "this.onLoad = function () {\n\t\n}\n\nthis.onUpdate = function () {\n\t\n}\n";
+    //this.wickScript = "function load() {\n\t\n}\n\nfunction update() {\n\t\n}\n";
+    this.wickScript = "";
 };
     
-WickFrame.prototype.update = function () {
+WickFrame.prototype.tick = function () {
     var self = this;
-
-    /*if(this.uuid.substring(0,2) === '50') {
-        console.log(this._wasActiveLastTick)
-        console.log(this._active)
-    }*/
-
-    //console.log("Frame update() " + this.uuid.substring(0,2))
 
     // Inactive -> Inactive
     // Do nothing, frame is still inactive
@@ -47,14 +56,14 @@ WickFrame.prototype.update = function () {
     // Inactive -> Active
     // Frame just became active! It's fresh!
     else if (!this._wasActiveLastTick && this._active) {
-        //console.log("Frame onLoad " + this.uuid.substring(0,2))
-        (wickEditor || wickPlayer).project.runScript(this, 'onLoad');
+        (wickEditor || wickPlayer).project.loadScriptOfObject(this);
+        
+        (wickEditor || wickPlayer).project.runScript(this, 'load');
     }
     // Active -> Active
     // Frame is active!
     else if (this._wasActiveLastTick && this._active) {
-        //console.log("Frame onUpdate " + this.uuid.substring(0,2))
-        (wickEditor || wickPlayer).project.runScript(this, 'onUpdate');
+        (wickEditor || wickPlayer).project.runScript(this, 'update');
     }    
     // Active -> Inactive
     // Frame just stopped being active. Clean up!
@@ -63,10 +72,9 @@ WickFrame.prototype.update = function () {
     }
 
     this.wickObjects.forEach(function (wickObject) {
-        wickObject.update();
+        wickObject.tick();
     });
 }
-
 
 WickFrame.prototype.isActive = function () {
     var parent = this.parentLayer.parentWickObject;
@@ -82,6 +90,10 @@ WickFrame.prototype.isActive = function () {
     return parent.playheadPosition >= this.playheadPosition
         && parent.playheadPosition < this.playheadPosition+this.length
         && parent.isActive();
+}
+
+WickFrame.prototype.hasScript = function () {
+    return this.wickScript !== "";
 }
 
 // Extend our frame to encompass more frames. 
@@ -196,15 +208,7 @@ WickFrame.prototype.getAsJSON = function () {
         wickObject.encodeStrings();
     });
 
-    var dontJSONVars = ["cachedImageData","fabricObjectReference","parentObject","causedAnException","uuid"];
-
-    var frameJSON = JSON.stringify(this, function(key, value) {
-        if (dontJSONVars.indexOf(key) !== -1) {
-            return undefined;
-        } else {
-            return value;
-        }
-    });
+    var frameJSON = JSON.stringify(this, WickProject.Exporter.JSONReplacerObject);
 
     this.wickObjects.forEach(function (wickObject) {
         wickObject.decodeStrings();
@@ -225,4 +229,14 @@ WickFrame.fromJSON = function (frameJSON) {
     return frame;
 }
 
+WickFrame.fromJSONArray = function (jsonArrayObject) {
+    var frames = [];
 
+    var framesJSONArray = jsonArrayObject.wickObjectArray;
+    framesJSONArray.forEach(function (frameJSON) {
+        var newframe = WickFrame.fromJSON(frameJSON)
+        frames.push(newframe)
+    });
+
+    return frames;
+}

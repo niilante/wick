@@ -1,5 +1,20 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
 /* WickProject Exporter */
 /* Bundles WickProjects with the WickPlayer in a single HTML file. */
 
@@ -7,8 +22,8 @@ WickProject.Exporter = (function () {
 
     var projectExporter = { };
 
-    projectExporter.bundleProjectToHTML = function (wickProject, callback) {
-
+    projectExporter.generatePlayer = function () {
+        
         var fileOut = "";
 
         // Add the player webpage (need to download the empty player)
@@ -17,7 +32,7 @@ WickProject.Exporter = (function () {
 
         // All libs needed by the player. 
         var requiredLibFiles = [
-            "lib/jquery.min.js",
+            /*"lib/jquery.min.js",*/
             "lib/pixi.4.2.2.min.js",
             "lib/lz-string.min.js",
             "lib/screenfull.js",
@@ -28,15 +43,17 @@ WickProject.Exporter = (function () {
             "lib/checkInput.js",
             "lib/canvasutils.js",
             "lib/random.js",
-            "lib/socket.io-1.2.0.js",
+            /*"lib/socket.io-1.2.0.js",*/
             "lib/Tween.js",
             "lib/lerp.js",
             "lib/bowser.js",
+            "lib/howler.min.js",
             "lib/URLParameterUtils.js",
             "src/project/WickTween.js",
             "src/project/WickFrame.js",
             "src/project/WickLayer.js",
             "src/project/WickObject.js",
+            "src/project/WickPlayRange.js",
             "src/project/WickProject.js",
             "src/project/WickProject.Compressor.js",
             "src/player/WickPlayer.Preloader.js",
@@ -50,10 +67,28 @@ WickProject.Exporter = (function () {
         requiredLibFiles.forEach(function (filename) {
             var script = FileDownloader.downloadFile(filename);
             console.log(script.length + " used for " + filename);
+
+            //var scriptCompressed = LZString.compressToBase64(script)
+            //console.log(scriptCompressed.length + " compressed: " + filename);
+
             totalSize += script.length;
             fileOut += "<script>" + script + "</script>\n";
         });
         console.log(totalSize + " total");
+
+        return fileOut;
+
+    }
+
+    projectExporter.exportPlayer = function () {
+        var emptyplayerString = projectExporter.generatePlayer();
+        var blob = new Blob([emptyplayerString], {type: "text/plain;charset=utf-8"});
+        saveAs(blob, "player.html")
+    }
+
+    projectExporter.bundleProjectToHTML = function (wickProject, callback) {
+
+        var fileOut = projectExporter.generatePlayer();
 
         // Bundle the JSON project
         wickProject.getAsJSON(function (JSONProject) {
@@ -95,19 +130,44 @@ WickProject.Exporter = (function () {
 
     }
 
-    projectExporter.JSONReplacer = function(key, value) {
-        var dontJSONVars = [
-            "currentObject",
-            "parentObject",
-            "causedAnException",
-            "fabricObjectReference",
-            "parentLayer",
-            "parentWickObject",
-            "parentFrame",
-            "alphaMask"
-        ];
+    var dontJSONVars = [
+        "thumbnail",
+        "currentObject",
+        "parentObject",
+        "causedAnException",
+        "fabricObjectReference",
+        "parentLayer",
+        "parentWickObject",
+        "parentFrame",
+        "alphaMask",
+        "thumbnail",
+        "cachedImageData",
+        "fabricObjectReference",
+        "parentObject",
+        "causedAnException",
+        "parentLayer",
+        "parentWickObject",
+        "parentFrame",
+        "thumbnail",
+        "cachedImageData",
+        "fabricObjectReference",
+        "parentObject",
+        "parentWickObject",
+        "parentLayer",
+        "parentFrame",
+        "causedAnException",
+    ];
 
+    projectExporter.JSONReplacer = function(key, value) {
         if (dontJSONVars.indexOf(key) !== -1) {
+            return undefined;
+        } else {
+            return value;
+        }
+    }
+
+    projectExporter.JSONReplacerObject = function (key, value) {
+        if (key === "uuid" || dontJSONVars.indexOf(key) !== -1) {
             return undefined;
         } else {
             return value;

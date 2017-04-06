@@ -1,12 +1,29 @@
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
 body {
 	--playhead-width: 2px;
 
 	--common-padding: 4px;
     
-    --max-timeline-height: 200px; 
+    --max-timeline-height: 150px; 
 
 	--layers-width: 150px;
-	--layer-height: 46px;
+	--layer-height: 40px;
 
 	--frame-width: 80px;
 	--frame-handle-width: 8px;
@@ -28,7 +45,7 @@ body {
     --scrollbar-thickness: 18px;
 
 
-    --number-line-height: 23px;
+    --number-line-height: 20px;
 }
 
 .timeline {
@@ -70,7 +87,7 @@ body {
 
 .layer-tools-button {
 	position: absolute;
-
+    
 	top: 0px;
 	left: 0px;
 
@@ -87,22 +104,43 @@ body {
 }
 
 .delete-layer-button {
+    position: relative;
 	left: calc(var(--scrollbar-thickness) + 5px);
     background-image: url("/resources/minusButton.svg");
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: left;
+    text-overflow: clip;
+    overflow: hidden;
     background-size: 12px 12px;
+    transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));
+/*    clip: rect(10px, 20px, 30px, 40px);*/
+/*    display: inline;*/
+    z-index: 1;
+
     
 }
 
+.delete-layer-button:hover {
+    width: 100px;
+}
 .add-layer-button {
     background-image: url(/resources/plusButton.svg);
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: 50% 50%;
     background-size: 12px 12px;
+    background-size: 12px 12px;
+    transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));
+    z-index: 2;
 }
 
-
+.add-layer-button:hover {
+    width: 100px;
+    z-index: 2;
+    background-position: 5%;
+    background
+}
 
 .layer {
 	background-color: #4a6588;
@@ -131,6 +169,7 @@ body {
 	box-shadow: var(--border);
 
 	font-size: 12px;
+    font-family: "Anonymous Pro"
 }
 
 .active-layer {
@@ -237,29 +276,37 @@ body {
 }
 
 .frame-extender-handle-right {
-	float:right;
-    
+	float: right;
+    background-color: blue;
 }
 
-.frame-extender-handle-right:hover{
-    
-    background-color: black;
-}
+/*@ToDo create Left Frame handler grabbers*/
+
 
 .frame-extender-handle-left {
-
+    background-color: red;
+    position: absolute; 
+    left: 0px;
+    top: 0px;
 }
 
 .selection-overlay {
+
 	width:  100%;
 	height: 100%;
 	position: absolute;
 	pointer-events: none;
-	box-shadow: inset 0px 0px 0px 2px cyan;
-	background-color: cyan;
-	opacity: .1;
+	box-shadow: inset 0px 0px 0px 3px #5BBEDB, 0px 0px 0px 2px #48A5BE; 
+/*	background-color: cyan;*/
+/*
+    border-color: red;
+    border-width: 5px;
+*/
+/*	opacity: .1;*/
 	left: 0px;
 	top:0px;
+
+
 
 }
 
@@ -407,7 +454,16 @@ body {
 	position: absolute;
 	height: var(--number-line-height);
     color: #fafafa;
+    font-size: vmin;
+    font-family: "Anonymous Pro" ;
+    margin-top: 3px;
 }
+
+@font-face {
+    font-family: myFirstFont;
+    src: url(sansation_light.woff);
+}
+
 
 .playrange {
 	cursor: move;

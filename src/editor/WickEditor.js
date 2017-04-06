@@ -1,5 +1,20 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
 /* This is the entry point for the whole editor */
 
 var WickEditor = function () {
@@ -26,13 +41,15 @@ var WickEditor = function () {
     }
 
     this.thumbnailRenderer = registerInterface(new ThumbnailRendererInterface(this));
+    this.gifRenderer = registerInterface(new GIFRendererInterface(this));
     this.builtinplayer = registerInterface(new BuiltinPlayerInterface(this));
     this.rightclickmenu = registerInterface(new RightClickMenuInterface(this));
     this.scriptingide = registerInterface(new ScriptingIDEInterface(this));
     this.timeline = registerInterface(new TimelineInterface(this));
     this.toolbar = registerInterface(new ToolbarInterface(this));
-    this.properties = registerInterface(new PropertiesInterface(this));
+    this.inspector = registerInterface(new InspectorInterface(this));
     this.paper = registerInterface(new PaperInterface(this));
+    this.pathRoutines = registerInterface(new PathRountines(this));
     this.fabric = registerInterface(new FabricInterface(this));
     this.menubar = registerInterface(new MenuBarInterface(this));
 
@@ -66,6 +83,15 @@ var WickEditor = function () {
 
     // Setup inputhandler
     this.inputHandler = new InputHandler(this);
+
+    // Setup renderer
+    window.rendererCanvas = document.getElementById('playerCanvasContainer');
+    if(!window.wickRenderer) {
+        window.wickRenderer = new WickPixiRenderer();
+        window.wickRenderer.setProject(that.project);
+        window.wickRenderer.setup();
+        that.thumbnailRenderer.renderAllThumbsOnTimeline();
+    }
 
     this.syncInterfaces();
 

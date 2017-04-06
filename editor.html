@@ -1,4 +1,19 @@
-<!-- Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli -->
+<!-- Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli -->
+
+<!-- This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. -->
 
 <!DOCTYPE html>
 <html>
@@ -9,6 +24,9 @@
     <link rel="stylesheet" type="text/css" href="styles/editor.css">
     <link rel="stylesheet" type="text/css" href="styles/timeline.css">
     <link rel="stylesheet" type="text/css" href="lib/rangeslider.css">
+
+    <!-- Insert this line above script imports (so it works for electron)  -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
 
     <script src="lib/jquery.min.js"></script>
     <script src="lib/fabric.1.7.3.js"></script>
@@ -41,6 +59,7 @@
     <script src="lib/Tween.js"></script>
     <script src="lib/lerp.js"></script>
     <script src="lib/bowser.js"></script>
+    <script src="lib/howler.min.js"></script>
 
     <script src="src/project/WickFrame.js"></script>
     <script src="src/project/WickLayer.js"></script>
@@ -56,17 +75,31 @@
     <script src="src/editor/Interfaces.Fabric.GUIElements.js"></script>
     <script src="src/editor/Interfaces.Fabric.SymbolBorders.js"></script>
     <script src="src/editor/Interfaces.Fabric.WickElements.js"></script>
-    <script src="src/editor/Interfaces.Fabric.ProjectRenderer.js"></script>
     <script src="src/editor/Interfaces.Paper.js"></script>
     <script src="src/editor/Interfaces.Paper.PathRoutines.js"></script>
     <script src="src/editor/Interfaces.BuiltinPlayer.js"></script>
     <script src="src/editor/Interfaces.RightClickMenu.js"></script>
     <script src="src/editor/Interfaces.ScriptingIDE.js"></script>
     <script src="src/editor/Interfaces.Timeline.js"></script>
+    <script src="src/editor/Interfaces.Timeline.AddFrameOverlay.js"></script>
+    <script src="src/editor/Interfaces.Timeline.Frame.js"></script>
+    <script src="src/editor/Interfaces.Timeline.FramesContainer.js"></script>
+    <script src="src/editor/Interfaces.Timeline.FramesStrip.js"></script>
+    <script src="src/editor/Interfaces.Timeline.HorizontalScrollBar.js"></script>
+    <script src="src/editor/Interfaces.Timeline.Interactions.js"></script>
+    <script src="src/editor/Interfaces.Timeline.LayersContainer.js"></script>
+    <script src="src/editor/Interfaces.Timeline.Layer.js"></script>
+    <script src="src/editor/Interfaces.Timeline.NumberLine.js"></script>
+    <script src="src/editor/Interfaces.Timeline.PlayRange.js"></script>
+    <script src="src/editor/Interfaces.Timeline.Playhead.js"></script>
+    <script src="src/editor/Interfaces.Timeline.SelectionBox.js"></script>
+    <script src="src/editor/Interfaces.Timeline.VerticalScrollBar.js"></script>
     <script src="src/editor/Interfaces.Toolbar.js"></script>
-    <script src="src/editor/Interfaces.Properties.js"></script>
+    <script src="src/editor/Interfaces.PathRoutines.js"></script>
+    <script src="src/editor/Interfaces.Inspector.js"></script>
     <script src="src/editor/Interfaces.MenuBar.js"></script>
     <script src="src/editor/Interfaces.ThumbnailRenderer.js"></script>
+    <script src="src/editor/Interfaces.GIFRenderer.js"></script>
 
     <script src="src/editor/Tools.Cursor.js"></script>
     <script src="src/editor/Tools.FillBucket.js"></script>
@@ -90,6 +123,10 @@
     <script src="src/player/WickPlayer.PixiRenderer.js"></script>
     <script src="src/player/WickPlayer.WebAudioPlayer.js"></script>
     <script src="src/player/WickPlayer.InputHandler.js"></script>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Anonymous+Pro" />
+
+    <!-- Insert this line after script imports -->
+    <script>if (window.module) module = window.module;</script>
 
     <script>
         $(document).ready(function() { 
@@ -102,354 +139,65 @@
 <body>
 <div class="noselect">
     <!-- Hidden element to always be selected so browser always fires copy/paste events -->
-
-        <input id="hidden-input" class="hidden" type="text" value="" />
+    <input id="hidden-input" class="hidden" type="text" value="" />
 
     <!-- Hidden element that gets clicked by other divs to open file dialog -->
-        
-        <input type="file" class="hidden" id="importButton" /> 
+    <input type="file" class="hidden" id="importButton" /> 
 
-    <!-- Editor GUI, visible when a project is being edited & not running -->
+    <div id="editor">
 
-        <div id="editor">
-
-        <!-- Fabric.js canvas -->
-
-            <div tabindex="1" id="editorCanvasContainer">
-                <canvas id="fabricCanvas"></canvas>
-            </div>
-
-        <!-- Timeline -->
-
-            <div id="timelineGUI" class="GUIBox">
-            </div>
-
-        <!-- Toolbar -->
-
-            <div id="toolbarGUI" class="GUIBox">
-
-                <div id="tools"></div>
-
-                <div id="toolOptionsGUI">
-                    <hr />
-                    <input class="jscolor" id="lineColor">
-                    <br />
-                    <canvas id="brushSizeDisplay" width="30" height="30"></canvas>
-                    <br />
-                    <div style="margin-left:9px;"><input id="lineWidth" type="range" min="2" max="10" data-rangeslider data-orientation="vertical"></div>
-                </div>
-            </div>
-
-        <!-- Properties -->
-
-            <div id="propertiesGUI" class="GUIBox">
-                <div id="selectionPropertiesTabButton"  class="propertiesTab propertiesTabActive">Selection</div>
-                <div id="projectPropertiesTabButton" class="propertiesTab">Project</div>
-
-                <div id="objectType">
-                    <img id="objectTypeIcon" src="resources/gearbox.png" width="22px"> <span id="objectTypeName" style="margin-left:5px;font-size:20px;">None</span>
-                </div>
-
-                <div id="frameProperties" class="propertiesGUIContent">
-                        <div class="propertyRow">
-                            <div class="propertyName">Name</div>
-                            <div class="propertyInputContainer">
-                                <div class="propertyInputDiv propertyInputDivLarge">
-                                    <input class="propertyInput propertyInputLarge" type="text" id="frameIdentifier"> 
-                                </div> 
-                            </div>
-                        </div>
-                    <br />
-                    <br />
-                    <!--<input type="checkbox" id="frameAutoplayCheckbox"> Always stop on this frame<br />-->
-                    <input type="checkbox" id="frameSaveStateCheckbox"> Always save frame state<br />
-                    <br />
-                    <div class="scriptButton" id="editFrameScriptsButton">Edit Frame Scripts</div>
-                </div>
-
-                <div id="playrangeProperties" class="propertiesGUIContent">
-                        <div class="propertyRow">
-                            <div class="propertyName">Name</div>
-                            <div class="propertyInputContainer">
-                                <div class="propertyInputDiv propertyInputDivLarge">
-                                    <input class="propertyInput propertyInputLarge" type="text" id="playrangeIdentifier"> 
-                                </div> 
-                            </div>
-                        </div>
-                    
-                    <br />
-                        <div class="propertyRow">
-                            <div class="propertyName">Color</div>
-                            <div class="propertyInputContainer">
-                                <input style="width:122px; float:right;" class="jscolor jscolorInline" value="FFFFFF" id="playRangeColor">
-                            </div>
-                        </div>
-                    
-                    
-                </div>
-
-                <div id="objectProperties" class="propertiesGUIContent">
-                        <div class="propertyRow">
-                            <div class="propertyName" style="float:left">Name</div>
-                            <div class="propertyInputContainer">
-                                <div class="propertyInputDiv propertyInputDivLarge">
-                                    <input class="propertyInput propertyInputLarge" type="text" id="objectName"> 
-                                </div> 
-                            </div>
-                        </div>
-                    <br />
-                        <div class="propertyRow">
-                            <div class="propertyName">Position</div>
-                            
-                            <div class="propertyInputContainer">
-                                <div class="propertyInputDiv propertyInputDivSmall" style="float:left;">
-                                    <input class="propertyInput propertyInputSmall" type="text" id="objectPositionX"> 
-                                </div> 
-                                
-                                <div class="propertyCross">x</div>
-                                
-                                <div class="propertyInputDiv propertyInputDivSmall" style="float:right;">
-                                    <input class="propertyInput propertyInputSmall" type="text" id="objectPositionY"> 
-                                </div> 
-                            </div>
-                        </div>
-                    <br />
-                    
-                        <div class="propertyRow">
-                            <div class="propertyName">Size</div>
-                            
-                            <div class="propertyInputContainer">
-                                <div class="propertyInputDiv propertyInputDivSmall" style="float:left;">
-                                    <input class="propertyInput propertyInputSmall" type="text" id="objectWidth"> 
-                                </div> 
-                                
-                                <div class="propertyCross">x</div>
-                                
-                                <div class="propertyInputDiv propertyInputDivSmall" style="float:right;">
-                                    <input class="propertyInput propertyInputSmall" type="text" id="objectHeight"> 
-                                </div> 
-                            </div>
-                        </div>
-                    <br />
-                    
-                        <div class="propertyRow">
-                            <div class="propertyName" style="float:left">Rotation</div>
-                            
-                            <div class="propertyInputContainer">
-                                <div class="propertyInputDiv propertyInputDivSmall" style="float:left;">
-                                    <input class="propertyInput propertyInputSmall" type="text" id="objectRotation"> 
-                                </div> 
-                            </div>
-                        </div>
-                    <br />
-                     <div class="propertyRow">
-                            <div class="propertyName" style="float:left">Opacity</div>
-                         
-                            <div class="propertyInputContainer">
-                                <input class="propertySlider" style="width:148px" type="range" value="255" min="0" max="255" id="opacitySlider">
-                            </div>
-                        </div>
-
-                    <br />
-                    <br />
-                    <div id="textProperties">
-                        <div class="propertyRow">
-                            <div class="propertyName" style="float:left">Font</div>
-                            <div class="propertyInputContainer">
-                                <select class= "fontSelector" style="float:right;" id="fontSelector">
-                                    <option value="Georgia">Georgia</option>
-                                    <option value="Palatino Linotype">Palatino Linotype</option>
-                                    <option value="Book Antiqua">Book Antiqua</option>
-                                    <option value="Times New Roman">Times New Roman</option>
-                                    <option value="Arial" selected>Arial</option>
-                                    <option value="Helvetica">Helvetica</option>
-                                    <option value="Arial Black">Arial Black</option>
-                                    <option value="Comic Sans MS">Comic Sans MS</option>
-                                    <option value="Impact">Impact</option>
-                                    <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
-                                    <option value="Tahoma">Tahoma</option>
-                                    <option value="Geneva">Geneva</option>
-                                    <option value="Trebuchet MS">Trebuchet MS</option>
-                                    <option value="Verdana">Verdana</option>
-                                    <option value="Courier New">Courier New</option>
-                                    <option value="Lucida Console">Lucida Console</option>
-                                </select>
-                            </div>
-                        </div>
-                        <br /><br />
-                        <div class="propertyRow">
-                            <div class="propertyName" style="float:left">Color</div>
-                            
-                            <div class="propertyInputContainer">
-                                <input style="width:140px; float:right;" class="jscolor jscolorInline" value="FFFFFF" id="fontColor">
-                            </div>
-                        </div>
-                        <br />
-                        
-                            <div class="propertyRow">
-                                <div class="propertyName">Size</div>
-                                <div class="propertyInputContainer">
-                                    <div class="propertyInputDiv propertyInputDivLarge">
-                                        <input class="propertyInput propertyInputLarge" type="text" id="fontSize"> 
-                                    </div> 
-                                </div>
-                            </div>
-                        <br /><br />
-                        <input type="checkbox" id="boldCheckbox"> Bold<br />
-                        <input type="checkbox" id="italicCheckbox"> Italic<br />
-                        <br />
-                    </div>
-                    <div id="soundProperties">
-                        <input type="checkbox" id="autoplayCheckbox"> Autoplay<br />
-                        <input type="checkbox" id="loopCheckbox"> Loop<br />
-                    </div>
-                    <div id="tweenProperties">
-                        <strong>Tween Options</strong>
-                        <br />
-                        <br />
-                        Type<select style="float:right; width:130px;" id="tweenType">
-                            <option value="Linear">Linear</option>
-                            <option value="Quadratic">Quadratic</option>
-                            <option value="Cubic">Cubic</option>
-                            <option value="Quartic">Quartic</option>
-                            <option value="Quintic">Quintic</option>
-                            <option value="Sinusoidal">Sinusoidal</option>
-                            <option value="Exponential">Exponential</option>
-                            <option value="Circular">Circular</option>
-                            <option value="Elastic">Elastic</option>
-                            <option value="Back">Back</option>
-                            <option value="Bounce">Bounce</option>
-                        </select>
-                        <br /><br />
-                        In/Out<select style="float:right; width:130px;" id="tweenDir">
-                            <option value="In">In</option>
-                            <option value="Out">Out</option>
-                            <option value="InOut">InOut</option>
-                        </select>
-                    </div>
-                    <div id="symbolProperties">
-                        <div class="scriptButton" id="editScriptsButtonProperties">Edit Symbol Scripts</div>
-                        <div class="scriptButton" id="editObjectButtonProperties">Edit Object</div>
-                    </div>
-                </div>
-
-                <div id="projectProperties" class="propertiesGUIContent">
-                    <div class="propertyRow">
-                        <div class="propertyName">Name</div>
-                        <div class="propertyInputContainer">
-                            <div class="propertyInputDiv propertyInputDivLarge">
-                                <input class="propertyInput propertyInputLarge" type="text" id="projectName"> 
-                            </div> 
-                        </div>
-                    </div>
-                    
-                    <br />
-                    
-                    <div class="propertyRow">
-                        <div class="propertyName">Background</div>
-                        <div class="propertyInputContainer">
-                            <input style="width:100px;" class="jscolor jscolorInline" value="#FFFFFF" id="projectBgColor">
-                        </div>
-                    </div>
-                    
-                    <br />
-                    
-                    <div class="propertyRow">
-                        <div class="propertyName">Border</div>
-                        <div class="propertyInputContainer">
-                            <input style="width:100px;" class="jscolor jscolorInline" value="#FFFFFF" id="projectBorderColor">
-                        </div>
-                    </div>
-                    
-                    <br />
-                    
-                    <div class="propertyRow">
-                        <div class="propertyName">Size</div>
-
-                        <div class="propertyInputContainer">
-                            <div class="propertyInputDiv propertyInputDivSmall" style="float:left;">
-                                <input class="propertyInput propertyInputSmall" type="text" id="projectSizeX"> 
-                            </div> 
-
-                            <div class="propertyCross">x</div>
-
-                            <div class="propertyInputDiv propertyInputDivSmall" style="float:right;">
-                                <input class="propertyInput propertyInputSmall" type="text" id="projectSizeY"> 
-                            </div> 
-                        </div>
-                    </div>
-                    
-                    <br />
-                    
-                    <div class="propertyRow">
-                        <div class="propertyName">Framerate</div>
-                        <div class="propertyInputContainer">
-                            <div class="propertyInputDiv propertyInputDivLarge">
-                                <input class="propertyInput propertyInputLarge" type="text" id="framerate"> 
-                            </div> 
-                        </div>
-                    </div>
-                    
-                    <br /> 
-                    <br />
-                    <input type="checkbox" id="transparentCheckbox"> Allow Transparency
-                    <br />
-                    <input type="checkbox" id="pixelPerfectRenderingCheckbox"> Pixel-perfect rendering
-<!--
-                    <br />
-                    <input type="checkbox" id="experimentalToolsCheckbox"> Enable experimental tools
-                    <br />
-                    <div id="experimentalWarning" style="color:red;display:none;">Warning: these tools are buggy and may break your project</div>
--->
-                    <br />
-                    <input type="checkbox" id="onionSkinningCheckbox"> Enable onion skinning
-                    <br />
-                </div>
-            </div>
-
-        <!-- Scripting IDE -->
-
-            <div id="scriptingGUI" class="GUIBox">
-                <div id="scriptObjectDiv">
-                    <div id="errorMessage"></div>
-                    <div id="scriptEditor"></div>
-                </div>
-                <div id="noSelectionDiv">
-                    No scriptable object selected!
-                </div>
-                <div class="elemInRow">
-                    <div class="button buttonInRow tooltipElem" id="beautifyButton" alt="Beautify Code">
-                        <img src="resources/beautify.png">
-                    </div>
-                    <div class="button buttonInRow tooltipElem" id="expandScriptingGUIButton" alt="Expand Scripting IDE">
-                        <img src="resources/fullscreen.png">
-                    </div>
-                    <div class="button buttonInRow tooltipElem" id="minimizeScriptingGUIButton" alt="Collapse Scripting GUI">
-                        <img src="resources/unfullscreen.png">
-                    </div>
-                    <div class="button buttonInRow tooltipElem" id="closeScriptingGUIButton" alt="Close Scripting IDE">
-                        <img src="resources/close.png" width="16">
-                    </div>
-                </div>
-            </div>
-
+        <div tabindex="1" id="editorCanvasContainer">
+            <canvas id="fabricCanvas"></canvas>
         </div>
 
-    <!-- Builtin player, visible when a project is running -->
+        <div id="timelineGUI" class="GUIBox">
+        </div>
 
-        <div id="builtinPlayer">
-            <div id="playerCanvasContainer" readonly="readonly" contenteditable="true" tabindex="0"></div>
+        <div id="toolbarGUI" class="GUIBox">
+            <div id="tools"></div>
+        </div>
 
-            <div id="builtinPlayerGUI" class="GUIBox">
-                <div class="button buttonInRow tooltipElem" id="closeBuiltinPlayerButton" alt="Close player">
-                    <img src="resources/back.png" width="30" />
+        <div id="inspectorGUI" class="GUIBox">
+            
+        </div>
+
+        <div id="scriptingGUI" class="GUIBox">
+            <div id="scriptObjectDiv">
+                <div id="errorMessage"></div>
+                <div id="scriptEditor"></div>
+            </div>
+            <div id="noSelectionDiv">
+                No scriptable object selected!
+            </div>
+            <div class="elemInRow">
+                <div class="button buttonInRow tooltipElem" id="beautifyButton" alt="Beautify Code">
+                    <img src="resources/beautify.png">
+                </div>
+                <div class="button buttonInRow tooltipElem" id="expandScriptingGUIButton" alt="Expand Scripting IDE">
+                    <img src="resources/fullscreen.png">
+                </div>
+                <div class="button buttonInRow tooltipElem" id="minimizeScriptingGUIButton" alt="Collapse Scripting GUI">
+                    <img src="resources/unfullscreen.png">
+                </div>
+                <div class="button buttonInRow tooltipElem" id="closeScriptingGUIButton" alt="Close Scripting IDE">
+                    <img src="resources/close.png" width="16">
                 </div>
             </div>
         </div>
 
-    <!-- Tooltips -->
+    </div>
 
-        <div id="tooltipGUI" class="GUIBox tooltip"></div>
+    <div id="builtinPlayer">
+        <div id="playerCanvasContainer" readonly="readonly" contenteditable="true" tabindex="0"></div>
+
+        <div id="builtinPlayerGUI" class="GUIBox">
+            <div class="button buttonInRow tooltipElem" id="closeBuiltinPlayerButton" alt="Close player">
+                <img src="resources/back.png" width="30" />
+            </div>
+        </div>
+    </div>
+
+    <div id="tooltipGUI" class="GUIBox tooltip"></div>
 
 </div>
 </body>

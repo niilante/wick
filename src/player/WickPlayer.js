@@ -1,5 +1,20 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
 
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
+    
 var WickPlayer = function () {
 
     var self = this;
@@ -7,92 +22,94 @@ var WickPlayer = function () {
     self.project;
 
     self.inputHandler;
-    self.renderer;
     self.audioPlayer;
 
     self.canvasContainer;
 
+    self.running = false;
+
     var initialStateProject;
-    var stopDrawLoop;
 
-    var tick;
+    self.runProject = function (projectJSON) {
 
+        self.running = true;
 
-    self.runProject = function (projectJSON, canvasContainer) {
-
-        tick = 1;
-        stopDrawLoop = false;
-
-        self.canvasContainer = canvasContainer;
+        window.rendererCanvas = document.getElementById('playerCanvasContainer');
+        self.canvasContainer = window.rendererCanvas;
 
         // Load the project!
         self.project = WickProject.fromJSON(projectJSON);
         initialStateProject = WickProject.fromJSON(projectJSON);
-        self.project.fitScreen = !window.wickEditor;
-        initialStateProject.fitScreen = !window.wickEditor;
+        self.project.fitScreen = bowser.tablet || bowser.mobile;
+        initialStateProject.fitScreen = bowser.tablet || bowser.mobile;
+        self.project.prepareForPlayer();
+        initialStateProject.prepareForPlayer();
 
-        // Setup all the handlers n stuff
+        // Setup renderer/input/audio player
+        if(!window.wickRenderer) {
+            window.wickRenderer = new WickPixiRenderer(self.canvasContainer);
+            window.wickRenderer.setProject(self.project);
+            window.wickRenderer.setup();
+        }
+        window.wickRenderer.setProject(self.project);
         self.inputHandler = new WickPlayerInputHandler(this, self.canvasContainer);
-        self.renderer = new WickPixiRenderer(self.project, self.canvasContainer);
         self.audioPlayer = new WickWebAudioPlayer(self.project);
 
         self.inputHandler.setup();
         if(!bowser.mobile && !bowser.tablet) self.audioPlayer.setup();
-        self.renderer.setup();
-        self.renderer.refresh(self.project.rootObject);
-
-        update();
+        window.wickRenderer.refresh(self.project.rootObject);
 
         var preloader = new WickPreloader();
+
+        window.wickRenderer.render([]);
+        update(true);
 
     }
 
     self.stopRunningProject = function () {
 
-        self.project = null;
+        self.running = false;
 
-        stopDrawLoop = true;
+        update();
+        clearTimeout(loopTimeout);
+
+        self.project = null;
 
         self.inputHandler.cleanup();
         self.audioPlayer.cleanup();
-        self.renderer.cleanup();
+        //window.wickRenderer.cleanup();
 
     }
 
     self.enterFullscreen = function () {
-        self.renderer.enterFullscreen();
+        window.wickRenderer.enterFullscreen();
     }
 
-    var update = function () {
+    var loopTimeout;
+    var update = function (firstTick) {
 
-        if(stopDrawLoop) return;
+        if(!self.running) return;
 
         if(self.project.framerate < 60) {
-            setTimeout(function() {
+            loopTimeout = setTimeout(function() {
 
-                if(!stopDrawLoop) {
+                if(self.running) {
 
-                    /*console.log(" ")
-                    console.log("PLAYER TICK " + tick)*/
-                    tick++;
-                    
-                    self.project.update();
-                    //self.project.rootObject.applyTweens();
-                    self.renderer.render(self.project.rootObject.getAllActiveChildObjects());
+                    if(!firstTick) self.project.tick();
+                    window.wickRenderer.render(self.project.rootObject.getAllActiveChildObjects());
+                    self.inputHandler.update(false);
+
                     update();
-                    self.inputHandler.update();
-                    //requestAnimationFrame(update);
                 }
             }, 1000 / self.project.framerate);
 
         } else {
 
-            if(!stopDrawLoop) {
-                requestAnimationFrame(update);
+            if(self.running) {
+                requestAnimationFrame(function () { update(false) });
             }
-            self.project.update();
-            //self.project.rootObject.applyTweens();
-            self.renderer.render(self.project.rootObject.getAllActiveChildObjects());
+            if(!firstTick) self.project.tick();
+            window.wickRenderer.render(self.project.rootObject.getAllActiveChildObjects());
             self.inputHandler.update();
 
         }
@@ -107,7 +124,7 @@ var WickPlayer = function () {
 
     self.cloneObject = function (wickObj) {
         var clone = wickObj.copy();
-        clone._isClone = true;
+        clone.isClone = true;
 
         clone.prepareForPlayer()
 
@@ -115,7 +132,7 @@ var WickPlayer = function () {
         clone.parentObject.getCurrentLayer().getCurrentFrame().wickObjects.push(clone);
         self.project.rootObject.generateParentObjectReferences();
 
-        self.renderer.refresh(clone);
+        window.wickRenderer.refresh(clone);
 
         return clone;
     }
@@ -134,7 +151,7 @@ var WickPlayer = function () {
     self.resetStateOfObject = function (wickObject) {
 
         // Clones go away because they have no original state! :O
-        if(wickObject.isClone()) {
+        if(wickObject.isClone) {
             project.currentObject.removeChild(wickObject);
             return;
         }

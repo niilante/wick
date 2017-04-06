@@ -1,4 +1,19 @@
-/* Wick - (c) 2016 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+/* Wick - (c) 2017 Zach Rispoli, Luca Damasco, and Josh Rispoli */
+
+/*  This file is part of Wick. 
+    
+    Wick is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Wick is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
 
 var WickObject = function () {
 
@@ -27,7 +42,8 @@ var WickObject = function () {
 
 // Common
     
-    this.wickScript = "this.onLoad = function () {\n\t\n}\n\nthis.onUpdate = function () {\n\t\n}\n\nthis.onClick = function () {\n\t\n}\n";
+    //this.wickScript = "function load() {\n\t\n}\n\nfunction update() {\n\t\n}\n";
+    this.wickScript = "";
 
 // Static
 
@@ -41,8 +57,8 @@ var WickObject = function () {
 
 // Symbols
 
-    // See design docs for how objects and symbols work.
     this.isSymbol = false;
+    this.isButton = false;
 
     // Used to keep track of what frame is being edited
     this.playheadPosition = null;
@@ -188,12 +204,10 @@ WickObject.createSymbolFromWickObjects = function (wickObjects) {
 
     var firstFrame = symbol.layers[0].frames[0];
     for(var i = 0; i < wickObjects.length; i++) {
-        var ii = wickObjects.length-1-i; // So objects are properly ordered in symbol
+        firstFrame.wickObjects[i] = wickObjects[i];
 
-        firstFrame.wickObjects[ii] = wickObjects[i];
-
-        firstFrame.wickObjects[ii].x = wickObjects[i].x - symbol.x;
-        firstFrame.wickObjects[ii].y = wickObjects[i].y - symbol.y;
+        firstFrame.wickObjects[i].x = wickObjects[i].x - symbol.x;
+        firstFrame.wickObjects[i].y = wickObjects[i].y - symbol.y;
     }
 
     symbol.width  = firstFrame.wickObjects[0].width;
@@ -293,23 +307,7 @@ WickObject.prototype.getAsJSON = function () {
     // Encode scripts to avoid JSON format problems
     this.encodeStrings();
 
-    var dontJSONVars = [
-        "cachedImageData",
-        "fabricObjectReference",
-        "parentObject",
-        "causedAnException",
-        "uuid",
-        "parentLayer",
-        "parentWickObject",
-        "parentFrame"
-    ];
-    var JSONWickObject = JSON.stringify(this, function(key, value) {
-        if (dontJSONVars.indexOf(key) !== -1) {
-            return undefined;
-        } else {
-            return value;
-        }
-    });
+    var JSONWickObject = JSON.stringify(this, WickProject.Exporter.JSONReplacerObject);
 
     // Put prototypes back on object ('class methods'), they don't get JSONified on project export.
     WickObject.addPrototypes(this);
@@ -604,8 +602,8 @@ WickObject.prototype.hasTweenAtFrame = function (frame) {
 WickObject.prototype.getFromTween = function () {
     var foundTween = null;
 
-    var relativePlayheadPosition = this.parentObject.getCurrentLayer().getRelativePlayheadPosition(this);
-
+    var relativePlayheadPosition = this.parentObject.playheadPosition - this.parentFrame.playheadPosition;
+    
     var seekPlayheadPosition = relativePlayheadPosition;
     while (!foundTween && seekPlayheadPosition >= 0) {
         this.tweens.forEach(function (tween) {
@@ -622,7 +620,7 @@ WickObject.prototype.getFromTween = function () {
 WickObject.prototype.getToTween = function () {
     var foundTween = null;
 
-    var relativePlayheadPosition = this.parentObject.getRelativePlayheadPosition(this);
+    var relativePlayheadPosition = this.parentObject.playheadPosition - this.parentFrame.playheadPosition;
 
     var seekPlayheadPosition = relativePlayheadPosition;
     var parentFrameLength = this.parentObject.getFrameWithChild(this).length;
@@ -642,8 +640,6 @@ WickObject.prototype.applyTweens = function () {
 
     var that = this;
 
-    if(!this.tweens) this.tweens = []; // Rescue old projects created before tweens came out
-
     if (!this.isRoot && this.tweens.length > 0) {
         if(this.tweens.length === 1) {
             this.tweens[0].applyTweenToWickObject(that);
@@ -656,7 +652,7 @@ WickObject.prototype.applyTweens = function () {
                 var A = tweenFrom.frame;
                 var B = tweenTo.frame;
                 var L = B-A;
-                var P = that.parentObject.getRelativePlayheadPosition(that)-A;
+                var P = (this.parentObject.playheadPosition - this.parentFrame.playheadPosition)-A;
                 var T = P/L;
                 if(B-A === 0) T = 1;
                 
@@ -1026,12 +1022,51 @@ WickObject.prototype.play = function () {
     this._playing = true;
 }
 
-WickObject.prototype.pause = function () {
+WickObject.prototype.stop = function () {
 
     this._playing = false;
 }
 
+WickObject.prototype.getPlayrangeById = function (identifier) {
+    var foundPlayRange = null;
+
+    this.playRanges.forEach(function (playRange) {
+        if(playRange.identifier === identifier) {
+            foundPlayRange = playRange;
+        }
+    });
+
+    return foundPlayRange;
+}
+
+WickObject.prototype.getFramesInPlayrange = function (playrange) {
+    var frames = [];
+
+    this.layers.forEach(function (layer) {
+        for(var i = playrange.start; i < playrange.end; i++) {
+            var frame = layer.getFrameAtPlayheadPosition(i);
+            if(frame && !frames.includes(frame)) {
+                frames.push(frame);
+            }
+        }
+    });
+
+    return frames;
+}
+
+WickObject.prototype.gotoAndStop = function (frame) {
+    this.movePlayheadTo(frame);
+    this.stop();
+}
+
+WickObject.prototype.gotoAndPlay = function (frame) {
+    this.movePlayheadTo(frame);
+    this.play();
+}
+
 WickObject.prototype.movePlayheadTo = function (frame) {
+
+    this._forceNewPlayheadPosition = true;
 
     var oldFrame = this.getCurrentLayer().getCurrentFrame();
 
@@ -1049,12 +1084,7 @@ WickObject.prototype.movePlayheadTo = function (frame) {
 
     } else if (CheckInput.isString(frame)) {
 
-        var foundPlayRange = null;
-        this.playRanges.forEach(function (playRange) {
-            if(playRange.identifier === frame) {
-                foundPlayRange = playRange;
-            }
-        });
+        var foundPlayRange = this.getPlayrangeById(frame)
 
         if(foundPlayRange) {
             if(this.playheadPosition < foundPlayRange.start || this.playheadPosition >= foundPlayRange.end) {
@@ -1259,7 +1289,7 @@ WickObject.prototype.isPointInside = function(point) {
 
 WickObject.prototype.setText = function (text) {
     //this.pixiText.text = ""+text;
-    wickPlayer.renderer.setText(this, text);
+    wickRenderer.setText(this, text);
 }
 
 WickObject.prototype.playSound = function () {
@@ -1281,10 +1311,6 @@ WickObject.prototype.setVolume = function (volume) {
 WickObject.prototype.clone = function () {
     return wickPlayer.cloneObject(this);
 };
-
-WickObject.prototype.isClone = function () {
-    return this._isClone;
-}
 
 WickObject.prototype.delete = function () {
     return wickPlayer.deleteObject(this);
@@ -1311,10 +1337,6 @@ WickObject.prototype.setValidator = function (validator) {
     });
 }
 
-/***************************************
-            stuff 2 deprecate
-***************************************/
-
 WickObject.prototype.prepareForPlayer = function () {
     // Set all playhead vars
     if(this.isSymbol) {
@@ -1325,69 +1347,13 @@ WickObject.prototype.prepareForPlayer = function () {
         this._playing = true;
         this._active = false;
 
-        this.setupScript = function () {
-            eval(this.wickScript);
-        }
-        this.setupScript();
         this.getAllFrames().forEach(function (frame) {
-            frame._active = false;
-            frame.setupScript = function () {
-                eval(this.wickScript);
-            }
-            frame.setupScript();
-        })
+            //frame.prepareForPlayer();
+        });
     }
 
     // Reset the mouse hovered over state flag
     this.hoveredOver = false;
-}
-
-WickObject.prototype.autocropImage = function (callback) {
-    var that = this;
-
-    var img = new Image();
-    img.onload = function() {
-        var cropImgData = removeBlankPixels(img, img.width, img.height);
-        var croppedSrc = cropImgData.dataURL;
-        var cropLeft = cropImgData.left;
-        var cropTop = cropImgData.top;
-
-        var autoCroppedImg = new Image();
-        autoCroppedImg.onload = function () {
-
-            /*AddPaddingToImage(autoCroppedImg, function (paddedImgSrc) {
-                var paddedImg = new Image();
-                paddedImg.onload = function () {
-                    that.width  = paddedImg.width;
-                    that.height = paddedImg.height;
-                    that.x += cropLeft + that.width/2;
-                    that.y += cropTop  + that.height/2;
-                    that.imageData = paddedImg.src;
-                    that.imageDirty = true;
-                    callback();
-                }
-                paddedImg.src = paddedImgSrc;
-            });*/
-
-            that.width  = autoCroppedImg.width;
-            that.height = autoCroppedImg.height;
-            that.x += cropLeft + that.width/2;
-            that.y += cropTop  + that.height/2;
-            that.imageData = autoCroppedImg.src;
-            that.imageDirty = true;
-            callback();
-        }
-        autoCroppedImg.src = croppedSrc;
-    }
-    img.src = this.imageData;
-}
-
-WickObject.prototype.getBlobImages = function (callback) {
-    var that = this;
-
-    FindBlobsAndGetBlobImages(this.imageData, function (blobImages) {
-        callback(blobImages);
-    });
 }
 
 /* Generate alpha mask for per-pixel hit detection */
@@ -1413,17 +1379,6 @@ WickObject.prototype.generateAlphaMask = function (imageData) {
 
 }
 
-WickObject.prototype.isClickable = function () {
-    if(!this.isSymbol) return false;
-
-    if(this._isClickable === undefined) {
-        var _onClickFnBody = this.onClick.toString().match(/function[^{]+\{([\s\S]*)\}$/)[1];
-        this._isClickable =  $.trim( _onClickFnBody ) !== '';
-    }
-
-    return this._isClickable;
-}
-
 WickObject.prototype.getCurrentFrames = function () {
     var currentFrames = [];
 
@@ -1435,39 +1390,61 @@ WickObject.prototype.getCurrentFrames = function () {
     return currentFrames;
 }
 
-WickObject.prototype.update = function () {
+WickObject.prototype.getFramesAtPlayheadPosition = function () {
+
+}
+
+WickObject.prototype.tick = function () {
     if(this._deleted) return;
 
     if(this.isSymbol) {
         this.layers.forEach(function (layer) {
             layer.frames.forEach(function (frame) {
-                frame.update();
+                frame.tick();
             });
         });
     }
 
+    if(this.isButton) {
+        this.stop();
+        if(this._beingClicked) {
+            if(this.getFramesInPlayrange(this.getPlayrangeById('mousedown')).length > 0)
+                this.movePlayheadTo('mousedown');
+        } else if (this.hoveredOver) {
+            if(this.getFramesInPlayrange(this.getPlayrangeById('mouseover')).length > 0)
+                this.movePlayheadTo('mouseover');
+        } else {
+            if(this.getFramesInPlayrange(this.getPlayrangeById('mouseup')).length > 0)
+                this.movePlayheadTo('mouseup');
+        }
+    }
+
     if(this._wasClicked) {
-        (wickEditor || wickPlayer).project.runScript(this, 'onClick');
+        (wickEditor || wickPlayer).project.runScript(this, 'mousedown');
         this._wasClicked = false;
     }
 
-    /*if(this.uuid.substring(0,2) === '35') {
-        if(this._active) {
-            console.log("ACTIVE!")
-        } else {
-            console.log("INACTIVE!")
-        }
-    }*/
+    if(this._wasHoveredOver) {
+        (wickEditor || wickPlayer).project.runScript(this, 'mouseover');
+        this._wasHoveredOver = false;
+    }
+
+    if(this._wasClickedOff) {
+        (wickEditor || wickPlayer).project.runScript(this, 'mouseup');
+        this._wasClickedOff = false;
+    }
 
     // Inactive -> Inactive
     if (!this._wasActiveLastTick && !this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("I -> I");
+
     }
     // Inactive -> Active
     else if (!this._wasActiveLastTick && this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("I -> A");
+        (wickEditor || wickPlayer).project.loadScriptOfObject(this);
 
-        (wickEditor || wickPlayer).project.runScript(this, 'onLoad');
+        (wickEditor || wickPlayer).project.runScript(this, 'load');
+
+        this.advanceTimeline();
 
         if(this.autoplaySound) {
             this.playSound();
@@ -1475,27 +1452,34 @@ WickObject.prototype.update = function () {
     }
     // Active -> Active
     else if (this._wasActiveLastTick && this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("A -> A");
+        (wickEditor || wickPlayer).project.runScript(this, 'update');
 
-        (wickEditor || wickPlayer).project.runScript(this, 'onUpdate');
+        this.advanceTimeline();
     }
     // Active -> Inactive
     else if (this._wasActiveLastTick && !this._active) {
-        //if(this.uuid.substring(0,2) === '35') console.log("A -> I");
-
         if(!this.parentFrame.alwaysSaveState) {
             // THIS IS VERY BROKEN AND DANGEROUS. DO NOT USE.
             //wickPlayer.resetStateOfObject(this);
         }
     }
 
+    if(this.fontData) {
+        if(this.varName) {
+            (wickEditor || wickPlayer).project.loadBuiltinFunctions(this);
+            this.setText(eval(this.varName));
+        }
+    }
+
+}
+
+WickObject.prototype.advanceTimeline = function () {
     if(this._playing && this.isSymbol && this._newPlayheadPosition === undefined) {
         this._newPlayheadPosition = this.playheadPosition+1;
         if(this._newPlayheadPosition >= this.getTotalTimelineLength()) {
             this._newPlayheadPosition = 0;
         }
     }
-
 }
 
 WickObject.prototype.isActive = function () {
@@ -1504,111 +1488,3 @@ WickObject.prototype.isActive = function () {
     return this.parentFrame.isActive();
 }
 
-/*WickObject.prototype.runScriptFn = function (fnName, objectScope, frame) {
-
-    var that = this;
-
-    if(!objectScope) objectScope = this.parentObject;
-
-    // Setup wickobject reference variables
-    window.project = wickPlayer.project || wickEditor.project;
-    window.root = project.rootObject;
-    window.parent = this.parentObject;
-
-    // Setup builtin wick scripting methods and objects
-    window.play           = function ()      { objectScope.play(); }
-    window.pause          = function ()      { objectScope.pause(); }
-    window.movePlayheadTo = function (frame) { objectScope.movePlayheadTo(frame); }
-
-    // Etc. player wrappers
-    window.stopAllSounds = function () { WickPlayer.getAudioPlayer().stopAllSounds(); };
-    window.keyIsDown = function (keyString) { return wickPlayer.inputHandler.keyIsDown(keyString); };
-    window.keyJustPressed = function (keyString) { return wickPlayer.inputHandler.keyJustPressed(keyString); }
-    window.getMouseX = function () { return WickPlayer.getMouse().x; }
-    window.getMouseY = function () { return WickPlayer.getMouse().y; }
-    window.hideCursor = function () { WickPlayer.hideCursor(); };
-    window.showCursor = function () { WickPlayer.showCursor(); };
-    window.enterFullscreen = function () { WickPlayer.enterFullscreen(); }
-
-    // WickObjects in same frame (scope) are accessable without using root./parent.
-    if(objectScope) {
-        objectScope.getAllChildObjects().forEach(function(child) {
-            if(child.name) window[child.name] = child;
-        });
-    }
-        
-    // Run da script!!
-    try {
-        //eval(script);
-        //eval("try{" + script + "\n}catch (e) { throw (e); }");
-        if(frame) {
-            frame[fnName]();
-        } else {
-            if(this[fnName])  this[fnName]();
-        }
-    } catch (e) {
-        if (window.wickEditor) {
-            //if(!wickEditor.builtinplayer.running) return;
-
-            console.error("Exception thrown while running script of WickObject: " + this.name);
-            console.error(e);
-            var lineNumber = null;
-            if(e.stack) {
-                e.stack.split('\n').forEach(function (line) {
-                    if(lineNumber) return;
-                    if(!line.includes("<anonymous>:")) return;
-
-                    lineNumber = parseInt(line.split("<anonymous>:")[1].split(":")[0]);
-                });
-            }
-
-            //console.log(e.stack.split("\n")[1].split('<anonymous>:')[1].split(":")[0]);
-            //console.log(e.stack.split("\n"))
-            if(wickEditor.builtinplayer.running) wickEditor.builtinplayer.stopRunningProject()
-            wickEditor.scriptingide.showError(frame || this, lineNumber, e);
-
-        } else {
-            alert("An exception was thrown while running a WickObject script. See console!");
-            console.log(e);
-        }
-    }
-    //eval("try{" + script + "}catch (e) { console.log(e); }");
-
-    // Get rid of wickobject reference variables
-    if(!this.isRoot) {
-        this.parentObject.getAllChildObjects().forEach(function(child) {
-            if(child.name) window[child.name] = undefined;
-        });
-    }
-
-}*/
-
-/*WickObject.prototype.advanceTimeline = function () {
-    // Advance timeline for this object
-    if(this.isPlaying && this.readyToAdvance) {
-
-        var oldFrame = this.getCurrentLayer().getCurrentFrame();
-        this.playheadPosition ++;
-
-        // If we reached the end, go back to the beginning
-        if(this.playheadPosition >= this.getTotalTimelineLength()) {
-            this.playheadPosition = 0;
-        }
-
-        var newFrame = this.getCurrentLayer().getCurrentFrame();
-
-        if(oldFrame !== newFrame) {
-            this.onNewFrame = true;
-            if(!newFrame) return;
-            if(!newFrame.alwaysSaveState) {
-                newFrame.wickObjects.forEach(function (child) {
-                    wickPlayer.resetStateOfObject(child);
-                });
-            }
-            this.getAllActiveChildObjects().forEach(function (child) {
-                child.justEnteredFrame = true;
-            });
-        }
-    }
-
-}*/

@@ -1,0 +1,124 @@
+body {
+	--header-height: 40px;
+
+	/* Placeholder for official font (Arial Rounded?) later. */
+	font-family: 'Nunito', Helvetica, sans-serif;
+	font-weight: bold;
+}
+
+a:link {
+	color: #00E3A0;
+	text-decoration: none;
+}
+
+a:hover {
+	color: #6EF8B0;
+}
+
+a:visited {
+	color: #00E3A0;
+}
+
+.header {
+	position: absolute;
+
+	top: 0px;
+	left: 0px;
+
+	width: 100%;
+	height: var(--header-height);
+
+	background-color: #00E3A0;
+}
+
+.header-bottom {
+	position: absolute;
+
+	bottom: 0px;
+	left: 0px;
+
+	width: 100%;
+	height: 12px;
+
+	background-color: #6EF8B0;
+}
+
+.viewer {
+	position: absolute;
+
+	top: var(--header-height);
+	left: 0px;
+
+	width: 100%;
+	height: calc(100% - var(--header-height));
+
+	background-color: #FFFFFF;
+
+	box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    border: 2px solid #6EF8B0;
+
+    overflow: hidden;
+}
+
+#viewer-frame {
+	width: 100%;
+	height: 100%;
+	border: none;
+}
+
+.footer {
+	position: absolute;
+
+	left: 6px;
+	bottom: 6px;
+
+	font-size: 18px;
+	font-style: italic;
+	font-weight: normal;
+	color: #666;
+}
+
+.wick-menu-bar {
+	color:white!important;
+	background-color:#3ee09e!important;
+}
+
+.w3-sidebar {
+	background-color:#23c07d!important;
+}
+
+.top-bar-item {
+	padding:8px 16px!important;
+	height: var(--header-height);
+	vertical-align: middle;
+	text-align: middle!important;
+	color:white!important;
+}
+.top-bar-item:hover {
+	color:white!important;
+	background-color:#23c07d!important
+}
+
+.side-bar-item:hover {
+	color:white!important;
+	background-color:#3ee09e!important;
+}
+
+.w3-bar {
+	height:40px!important;
+	padding:0px!important;
+}
+
+.w3-button {
+	align:center;
+	height: 100%
+	padding:2px 16px!important;
+}
+
+#accent-bar {
+	height:6px;
+	width:100%;
+	background-color: #d4f8f4;
+}
