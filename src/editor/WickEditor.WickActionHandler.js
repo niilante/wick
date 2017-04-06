@@ -981,12 +981,14 @@ var WickActionHandler = function (wickEditor) {
               , doc = parser.parseFromString(xmlString, "text/xml");
 
             var subtractWithPath = paper.project.importSVG(doc);
+            if(subtractWithPath.closePath) subtractWithPath.closePath();
 
             subtractWithPath.position.x = args.pathX;
             subtractWithPath.position.y = args.pathY;
 
             paths.forEach(function (path) {
                 var subtractedPath = path.paper.children[0].clone({insert:false});
+                if(subtractedPath.closePath) subtractedPath.closePath();
                 subtractedPath = subtractedPath.subtract(subtractWithPath.children[0])
                 path.pathData = '<svg id="svg" version="1.1" width="'+subtractedPath.bounds._width+'" height="'+subtractedPath.bounds._height+'" xmlns="http://www.w3.org/2000/svg">' +subtractedPath.exportSVG({asString:true})+ '</svg>';
                 path.forceFabricCanvasRegen = true;

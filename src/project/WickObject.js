@@ -1386,6 +1386,7 @@ WickObject.prototype.regenPaperJSState = function () {
           , doc = parser.parseFromString(xmlString, "text/xml");
 
         this.paper = paper.project.importSVG(doc);
+        if(this.paper.closePath) this.paper.closePath();
 
         this.paper.position.x = this.x;
         this.paper.position.y = this.y;
