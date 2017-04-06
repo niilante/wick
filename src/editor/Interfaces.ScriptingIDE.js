@@ -81,11 +81,12 @@ var ScriptingIDEInterface = function (wickEditor) {
             type: 'GET',
             data: {},
             success: function(data) {
-                window.wickDocs = "";
+                window.wickDocsKeywords = "";
+                window.wickDocs = data.docs;
                 if(!data.docs) return;
                 data.docs.forEach(function (doc) {
                     doc.properties.forEach(function (prop) {
-                        window.wickDocs += prop.name.split('(')[0] + "|"
+                        window.wickDocsKeywords += prop.name.split('(')[0] + "|"
                     });
                 });
             },

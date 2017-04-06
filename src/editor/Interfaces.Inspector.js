@@ -43,7 +43,7 @@ var InspectorInterface = function (wickEditor) {
         inspectorDiv = document.getElementById('inspectorGUI');
         inputs = [];
 
-        inputs.push(new StringInput(
+        /*inputs.push(new StringInput(
             'object-name',
             function () {
                 return wickEditor.project.getSelectedObject().name;
@@ -51,7 +51,7 @@ var InspectorInterface = function (wickEditor) {
             function (val) {
                 wickEditor.project.getSelectedObject().name = val;
             }
-        ));
+        ));*/
     }
 
     this.syncWithEditorState = function () {
