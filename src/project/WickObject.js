@@ -1379,6 +1379,19 @@ WickObject.prototype.generateAlphaMask = function (imageData) {
 
 }
 
+WickObject.prototype.regenPaperJSState = function () {
+    //if(!this.paper) {
+        var xmlString = this.pathData
+          , parser = new DOMParser()
+          , doc = parser.parseFromString(xmlString, "text/xml");
+
+        this.paper = paper.project.importSVG(doc);
+
+        this.paper.position.x = this.x;
+        this.paper.position.y = this.y;
+    //}
+}
+
 WickObject.prototype.getCurrentFrames = function () {
     var currentFrames = [];
 

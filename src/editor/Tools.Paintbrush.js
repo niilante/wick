@@ -74,46 +74,31 @@ Tools.Paintbrush = function (wickEditor) {
     }
 
     this.setup = function () {
-        // Listen for new paths drawn by fabric, vectorize them, and add them to the WickProject as WickObjects
-        /*wickEditor.fabric.canvas.on('object:added', function(e) {
-            if(!(wickEditor.currentTool instanceof Tools.Paintbrush)) return;
-
-            var fabricPath = e.target;
-
-            // Make sure the new object is actually a path created by fabric's drawing tool
-            if(fabricPath.type !== "path" || fabricPath.wickObjectRef) {
-                return;
-            }
-
-            potraceFabricPath(fabricPath, function(SVGData) {
-                var symbolOffset = wickEditor.project.currentObject.getAbsolutePosition();
-                var x = fabricPath.left - symbolOffset.x;
-                var y = fabricPath.top - symbolOffset.y;
-
-                //fabricPath.remove();
-                wickEditor.fabric.drawingPath = fabricPath;
-                
-                wickEditor.actionHandler.doAction('addObjects', {
-                    paths: [{svg:SVGData, x:x, y:y}]
-                });
-            });
-            
-        });*/
 
         window.secretPathListenerForWick = function (fabricPath) {
             potraceFabricPath(fabricPath, function(SVGData) {
-                //var symbolOffset = wickEditor.project.currentObject.getAbsolutePosition();
-                var x = fabricPath.left// - symbolOffset.x;
-                var y = fabricPath.top// - symbolOffset.y;
 
-                var pathWickObject = WickObject.fromPathFile(SVGData);
-                pathWickObject.x = x;
-                pathWickObject.y = y;
+                if(wickEditor.currentTool instanceof Tools.Eraser) {
+                    wickEditor.actionHandler.doAction('eraseWithPath', {
+                        pathData: SVGData,
+                        pathX: fabricPath.left,
+                        pathY: fabricPath.top
+                    });
+                } else {
+                    //var symbolOffset = wickEditor.project.currentObject.getAbsolutePosition();
+                    var x = fabricPath.left// - symbolOffset.x;
+                    var y = fabricPath.top// - symbolOffset.y;
 
-                wickEditor.actionHandler.doAction('addObjects', {
-                    wickObjects: [pathWickObject],
-                    dontSelectObjects: true
-                });
+                    var pathWickObject = WickObject.fromPathFile(SVGData);
+                    pathWickObject.x = x;
+                    pathWickObject.y = y;
+
+                    wickEditor.actionHandler.doAction('addObjects', {
+                        wickObjects: [pathWickObject],
+                        dontSelectObjects: true
+                    });
+                }
+
             });
         }
 

@@ -23,6 +23,7 @@
 
     <link rel="stylesheet" type="text/css" href="styles/editor.css">
     <link rel="stylesheet" type="text/css" href="styles/timeline.css">
+    <link rel="stylesheet" type="text/css" href="styles/scriptingide.css">
     <link rel="stylesheet" type="text/css" href="lib/rangeslider.css">
 
     <!-- Insert this line above script imports (so it works for electron)  -->
@@ -107,6 +108,7 @@
     <script src="src/editor/Tools.Eraser.js"></script>
     <script src="src/editor/Tools.Rectangle.js"></script>
     <script src="src/editor/Tools.Ellipse.js"></script>
+    <script src="src/editor/Tools.Line.js"></script>
     <script src="src/editor/Tools.Dropper.js"></script>
     <script src="src/editor/Tools.Text.js"></script>
     <script src="src/editor/Tools.Zoom.js"></script>
@@ -165,6 +167,10 @@
             <div id="scriptObjectDiv">
                 <div id="errorMessage"></div>
                 <div id="scriptEditor"></div>
+                <div id="scriptEditorSidebar">
+                    <div id="scriptEditorObjectName"></div>
+                    <img id="scriptEditorObjectThumbnail" />
+                </div>
             </div>
             <div id="noSelectionDiv">
                 No scriptable object selected!

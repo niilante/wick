@@ -14,47 +14,26 @@
 
     You should have received a copy of the GNU General Public License
     along with Wick.  If not, see <http://www.gnu.org/licenses/>. */
-    
+
 if(!window.Tools) Tools = {};
 
-Tools.Eraser = function (wickEditor) {
+Tools.Line = function (wickEditor) {
 
     var that = this;
 
     this.getCursorImage = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = 128;
-        canvas.height = 128;
-        var context = canvas.getContext('2d');
-        var centerX = canvas.width / 2;
-        var centerY = canvas.height / 2;
-        var radius = wickEditor.tools.paintbrush.brushSize/2 * wickEditor.fabric.canvas.getZoom();
-
-        context.beginPath();
-        context.arc(centerX, centerY, radius+1, 0, 2 * Math.PI, false);
-        context.fillStyle = "#000000"
-        context.fill();
-
-        context.beginPath();
-        context.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
-        context.fillStyle = "#FFFFFF";
-        context.fill();
-
-        return 'url(' + canvas.toDataURL() + ') 64 64,default';
+        return "crosshair"
     };
 
     this.getToolbarIcon = function () {
-        return "resources/eraser.png";
+        return "resources/line.png";
     }
 
     this.getTooltipName = function () {
-        return "Eraser";
+        return "Line";
     }
-    
-    this.setup = function () {
 
-        this.brushSize = 5;
-        this.color = "#000000";
+    this.setup = function () {
 
     }
 

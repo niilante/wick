@@ -62,29 +62,6 @@ var WickActionHandler = function (wickEditor) {
         }
     }
 
-    /* Class to store data of actions done, stored in the undo/redo stacks */
-    var StackActionGroup = function () {
-        this.stackActions = [];
-
-        this.doActions = function () {
-            this.stackActions.forEach(function (stackAction) {
-                stackAction.doAction();
-            });
-        }
-
-        this.undoActions = function () {
-            this.stackActions.forEachBackwards(function (stackAction) {
-                stackAction.undoAction();
-            });
-        }
-
-        this.redoActions = function () {
-            this.stackActions.forEachBackwards(function (stackAction) {
-                stackAction.doAction();
-            });
-        }
-    }
-
 // Private vars
 
     // Actions dict, stores action definitions
@@ -94,12 +71,6 @@ var WickActionHandler = function (wickEditor) {
     var undoStack = [];
     var redoStack = [];
 
-    // Flag that determines if we should chain actions in the stack
-    var actionBeingDone = false;
-
-    // Flag to ignore actions called by actions if they're being undone/redone
-    var initialAction = true;
-
     /* Call this to define a new action! */
     var registerAction = function(name, doFunction, undoFunction) {
         actions[name] = new WickAction(name, doFunction, undoFunction);
@@ -107,8 +78,6 @@ var WickActionHandler = function (wickEditor) {
 
     // done function, call when a WickAction is finished
     var done = function () {
-        actionBeingDone = false;
-
         // Sync interfaces + do other post-action cleanup
         wickEditor.project.rootObject.generateParentObjectReferences();
         wickEditor.syncInterfaces();
@@ -130,8 +99,6 @@ var WickActionHandler = function (wickEditor) {
     this.doAction = function (actionName, args) {
         if(!args) args = {};
 
-        if(!initialAction) return;
-
         // Check for invalid action
         if(!actions[actionName]) {
             console.error(actionName + " is not a defined WickAction!");
@@ -140,20 +107,10 @@ var WickActionHandler = function (wickEditor) {
 
         // Put the action on the undo stack to be undone later
         var newAction = new StackAction(actionName, args);
-        if(actionBeingDone) {
-            // Action triggered by another action, chain them together
-            var lastActionGroup = undoStack.pop();
-            lastActionGroup.stackActions.push(newAction);
-            undoStack.push(lastActionGroup);
-            newAction.doAction();
-        } else {
-            // Action triggered normally (form outside WickActionHandler), create new group
-            var newGroup = new StackActionGroup();
-            newGroup.stackActions.push(newAction);
-            actionBeingDone = true;
-            undoStack.push(newGroup);
-            newGroup.doActions();
-        }
+
+        undoStack.push(newAction);
+        newAction.doAction();
+
         redoStack = [];
 
     }
@@ -166,16 +123,12 @@ var WickActionHandler = function (wickEditor) {
             return;
         }
 
-        initialAction = false;
-
         // Get last action on the undo stack
-        var actionGroup = undoStack.pop();
+        var action = undoStack.pop();
 
         // Do the action and put it on the redo stack to be redone later
-        actionGroup.undoActions();
-        redoStack.push(actionGroup);
-
-        initialAction = true;
+        action.undoAction();
+        redoStack.push(action);
         
     }
 
@@ -187,16 +140,12 @@ var WickActionHandler = function (wickEditor) {
             return;
         }
 
-        initialAction = false
-
         // Get last action on the redo stack
-        var actionGroup = redoStack.pop();
+        var action = redoStack.pop();
 
         // Do the action and put it back onto the undo stack
-        actionGroup.redoActions();
-        undoStack.push(actionGroup);
-
-        initialAction = true
+        action.doAction();
+        undoStack.push(action);
 
     }
 
@@ -975,17 +924,11 @@ var WickActionHandler = function (wickEditor) {
             startTiming()
 
             touchingPaths.forEach(function (path) {
-                if(!path.paper) {
-                    var xmlString = path.pathData
-                      , parser = new DOMParser()
-                      , doc = parser.parseFromString(xmlString, "text/xml");
-
-                    path.paper = paper.project.importSVG(doc);
-
-                    path.paper.position.x = path.x;
-                    path.paper.position.y = path.y;
-                }
+                path.regenPaperJSState();
             });
+
+            stopTiming("regen paper states!")
+            startTiming();
 
             var superPath = touchingPaths[0].paper.children[0].clone({insert:false});
             touchingPaths.forEach(function (path) {
@@ -1010,6 +953,49 @@ var WickActionHandler = function (wickEditor) {
             });
 
             done();
+        },
+        function (args) {
+
+
+            done();
+        });
+
+    registerAction('eraseWithPath', 
+        function (args) {
+
+            startTiming()
+
+            var paths = [];
+            wickEditor.project.getCurrentFrame().wickObjects.forEach(function (wickObject) {
+                if(wickObject.pathData) {
+                    paths.push(wickObject);
+                    wickObject.regenPaperJSState();
+                }
+            });
+
+            stopTiming('regen paper states!')
+            startTiming()
+
+            var xmlString = args.pathData
+              , parser = new DOMParser()
+              , doc = parser.parseFromString(xmlString, "text/xml");
+
+            var subtractWithPath = paper.project.importSVG(doc);
+
+            subtractWithPath.position.x = args.pathX;
+            subtractWithPath.position.y = args.pathY;
+
+            paths.forEach(function (path) {
+                var subtractedPath = path.paper.children[0].clone({insert:false});
+                subtractedPath = subtractedPath.subtract(subtractWithPath.children[0])
+                path.pathData = '<svg id="svg" version="1.1" width="'+subtractedPath.bounds._width+'" height="'+subtractedPath.bounds._height+'" xmlns="http://www.w3.org/2000/svg">' +subtractedPath.exportSVG({asString:true})+ '</svg>';
+                path.forceFabricCanvasRegen = true;
+            });
+
+            stopTiming('subtraction!');
+
+            done();
+
         },
         function (args) {
 
