@@ -46,7 +46,7 @@ var FabricShapeDrawer = function (wickEditor, fabricInterface) {
                 left : screenXY.x,
                 width : 1,
                 height : 1,
-                fill : wickEditor.tools.paintbrush.color
+                fill : wickEditor.settings.drawingColor
             });
         } else if (shapeType === 'ellipse') {
             drawingShape = new fabric.Ellipse({
@@ -58,7 +58,7 @@ var FabricShapeDrawer = function (wickEditor, fabricInterface) {
                 //height : 1,
                 rx: 3,
                 ry: 3,
-                fill : wickEditor.tools.paintbrush.color
+                fill : wickEditor.settings.drawingColor
             });
         }
 

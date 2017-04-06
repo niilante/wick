@@ -88,7 +88,9 @@ var WickActionHandler = function (wickEditor) {
     var scrap = function (dontUndo) {
         actionBeingDone = false;
 
-        if(!dontUndo) self.undoAction();
+        if(!dontUndo) {
+            self.undoAction();
+        }
         redoStack.pop();
 
         done();
@@ -667,9 +669,12 @@ var WickActionHandler = function (wickEditor) {
                     if(frame!==currFrame && frame.touchesFrame(currFrame)) {
                         touching = true;
                     }
+                    if(frame.playheadPosition < 0) {
+                        touching = true;
+                    }
                 });
                 if(touching) {
-                    scrap();return;
+                    scrap();
                 }
             }
 

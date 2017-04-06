@@ -19,8 +19,6 @@ var FabricInterface = function (wickEditor) {
 
     var self = this;
 
-    var shapeStartPos = {x:0,y:0};
-
     this.setup = function () {
 
         this.canvas = new fabric.Canvas('fabricCanvas', {
@@ -121,11 +119,11 @@ var FabricInterface = function (wickEditor) {
         // Set drawing mode
         if(wickEditor.currentTool instanceof Tools.Paintbrush) {
             this.canvas.isDrawingMode = true;
-            this.canvas.freeDrawingBrush.width = wickEditor.currentTool.brushSize;
-            this.canvas.freeDrawingBrush.color = wickEditor.currentTool.color;
+            this.canvas.freeDrawingBrush.width = wickEditor.settings.brushThickness;
+            this.canvas.freeDrawingBrush.color = wickEditor.settings.drawingColor;
         } else if (wickEditor.currentTool instanceof Tools.Eraser) {
             this.canvas.isDrawingMode = true;
-            this.canvas.freeDrawingBrush.width = wickEditor.tools.paintbrush.brushSize;
+            this.canvas.freeDrawingBrush.width = wickEditor.settings.brushThickness;
             this.canvas.freeDrawingBrush.color = "#FFFFFF";
         } else {
             this.canvas.isDrawingMode = false;

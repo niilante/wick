@@ -36,7 +36,15 @@ TimelineInterface.NumberLine = function (wickEditor, timeline) {
             var numberLineCell = document.createElement('div');
             numberLineCell.className = 'number-line-cell';
             numberLineCell.style.left = i*cssVar('--frame-width') +cssVar('--frames-cell-first-padding') + 'px'
-            numberLineCell.innerHTML = "|"+(i+1);
+            
+            var bar = document.createElement('div');
+            bar.className = 'number-line-cell-bar';
+            numberLineCell.appendChild(bar);
+
+            var number = document.createElement('div');
+            number.className = 'number-line-cell-number';
+            number.innerHTML = (i+1);
+            numberLineCell.appendChild(number);
             
             this.elem.appendChild(numberLineCell);
         }
@@ -48,7 +56,7 @@ TimelineInterface.NumberLine = function (wickEditor, timeline) {
         this.playRanges = [];
 
         wickEditor.project.getCurrentObject().playRanges.forEach(function (wickPlayrange) {
-            var newPlayrange = new PlayRange();
+            var newPlayrange = new TimelineInterface.PlayRange(wickEditor, timeline);
             newPlayrange.wickPlayrange = wickPlayrange;
             newPlayrange.build();
             that.elem.appendChild(newPlayrange.elem);

@@ -88,15 +88,16 @@ TimelineInterface.Timeline = function (wickEditor) {
         this.elem.appendChild(hideLayersPiece);
 
         var addLayerButton = document.createElement('div');
-        addLayerButton.className = 'layer-tools-button add-layer-button';
+        addLayerButton.className = 'layer-tools-button add-layer-button tooltipElem';
+        addLayerButton.setAttribute('alt', "Add Layer");
         addLayerButton.addEventListener('mousedown', function (e) {
             wickEditor.guiActionHandler.doAction('addLayer');
         });
         hideLayersPiece.appendChild(addLayerButton);
 
         var deleteLayerButton = document.createElement('div');
-        deleteLayerButton.className = 'layer-tools-button delete-layer-button';
-        deleteLayerButton.innerHTML = 'Delete Layer'
+        deleteLayerButton.className = 'layer-tools-button delete-layer-button tooltipElem';
+        deleteLayerButton.setAttribute('alt', "Delete Layer");
         deleteLayerButton.addEventListener('mousedown', function (e) {
             wickEditor.guiActionHandler.doAction('removeLayer');
         });
@@ -132,7 +133,7 @@ TimelineInterface.Timeline = function (wickEditor) {
 
     this.calculateHeight = function () {
         var maxTimelineHeight = cssVar("--max-timeline-height");
-        var expectedTimelineHeight = this.layersContainer.layers.length * cssVar("--layer-height") + 58; 
+        var expectedTimelineHeight = this.layersContainer.layers.length * cssVar("--layer-height") + 44; 
         return Math.min(expectedTimelineHeight, maxTimelineHeight); 
     }
 }

@@ -50,7 +50,7 @@ Tools.FillBucket = function (wickEditor) {
             wickEditor.actionHandler.doAction('fillHole', {
                 x: mousePointX,
                 y: mousePointY,
-                color: wickEditor.tools.paintbrush.color
+                color: wickEditor.settings.drawingColor
             });
         });
     }

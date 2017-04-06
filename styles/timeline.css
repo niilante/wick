@@ -42,10 +42,10 @@ body {
 
     --frames-cell-first-padding: 5px;
 
-    --scrollbar-thickness: 18px;
+    --scrollbar-thickness: 14px;
 
 
-    --number-line-height: 20px;
+    --number-line-height: 16px;
 }
 
 .timeline {
@@ -112,8 +112,8 @@ body {
     text-overflow: clip;
     overflow: hidden;
     background-size: 12px 12px;
-    transition: width 0.5s;
-    transition-timing-function: cubic-bezier(steps(4));
+    /*transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));*/
 /*    clip: rect(10px, 20px, 30px, 40px);*/
 /*    display: inline;*/
     z-index: 1;
@@ -122,7 +122,8 @@ body {
 }
 
 .delete-layer-button:hover {
-    width: 100px;
+    /*width: 100px;*/
+    background-color: #31E19C;
 }
 .add-layer-button {
     background-image: url(/resources/plusButton.svg);
@@ -130,16 +131,17 @@ body {
     background-position: 50% 50%;
     background-size: 12px 12px;
     background-size: 12px 12px;
-    transition: width 0.5s;
-    transition-timing-function: cubic-bezier(steps(4));
+    /*transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));*/
     z-index: 2;
 }
 
 .add-layer-button:hover {
-    width: 100px;
+    /*width: 100px;
     z-index: 2;
     background-position: 5%;
-    background
+    background*/
+    background-color: #31E19C;
 }
 
 .layer {
@@ -251,8 +253,9 @@ body {
 }
 
 .frame-thumbnail {
-	max-height:100%; 
-	max-width:100%;
+	max-height: 90%; 
+	max-width: 90%;
+	padding: 1px;
 
 	margin: auto;
 	display: block;
@@ -454,9 +457,27 @@ body {
 	position: absolute;
 	height: var(--number-line-height);
     color: #fafafa;
-    font-size: vmin;
+}
+
+.number-line-cell-number {
+	position: absolute;
+	top: 1px;
+	left: 10px;
+
+	font-size: 14px;
+	font-weight: bold;
+    /*font-size: vmin;*/
     font-family: "Anonymous Pro" ;
-    margin-top: 3px;
+}
+
+.number-line-cell-bar {
+	position: absolute;
+	top: 0px;
+	left: 5px;
+
+	width: 1px;
+	height: 100%;
+	background-color: white;
 }
 
 @font-face {
