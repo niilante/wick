@@ -953,20 +953,26 @@ var WickActionHandler = function (wickEditor) {
 
     registerAction('uniteTouchingPaths', 
         function (args) {
-            startTiming()
 
-            var currObjs = wickEditor.project.getCurrentFrame().wickObjects;
-            var touchingPaths = [];
-            currObjs.forEach(function (obj) {
-                if(!obj.pathData) return;
-                var path = obj;
+            var touchingPaths;
+            if(args.touchingPaths) {
+                touchingPaths = args.touchingPaths;
+            } else {
+                var currObjs = wickEditor.project.getCurrentFrame().wickObjects;
+                var touchingPaths = [];
+                currObjs.forEach(function (obj) {
+                    if(!obj.pathData) return;
+                    var path = obj;
 
-                touchingPaths.push(path);
-            });
+                    touchingPaths.push(path);
+                });
+            }
 
             wickEditor.actionHandler.doAction('deleteObjects', {
                 objects: touchingPaths
             });
+
+            startTiming()
 
             touchingPaths.forEach(function (path) {
                 if(!path.paper) {
@@ -975,6 +981,9 @@ var WickActionHandler = function (wickEditor) {
                       , doc = parser.parseFromString(xmlString, "text/xml");
 
                     path.paper = paper.project.importSVG(doc);
+
+                    path.paper.position.x = path.x;
+                    path.paper.position.y = path.y;
                 }
             });
 
@@ -989,18 +998,18 @@ var WickActionHandler = function (wickEditor) {
             superGroup.addChild(superPath);
 
             var superPathString = superPath.exportSVG({asString:true});
-            var svgString = '<svg id="svg" version="1.1" width="200" height="200" xmlns="http://www.w3.org/2000/svg">' +superPathString+ '</svg>'
+            var svgString = '<svg id="svg" version="1.1" width="'+superPath.bounds._width+'" height="'+superPath.bounds._height+'" xmlns="http://www.w3.org/2000/svg">' +superPathString+ '</svg>'
             var superPathWickObject = WickObject.fromPathFile(svgString);
-            superPathWickObject.x = 0;
-            superPathWickObject.y = 0;
+            superPathWickObject.x = superPath.position.x;
+            superPathWickObject.y = superPath.position.y;
+
+            stopTiming("union!")
 
             wickEditor.actionHandler.doAction('addObjects', {
                 wickObjects: [superPathWickObject]
             });
 
             done();
-
-            stopTiming("union!")
         },
         function (args) {
 

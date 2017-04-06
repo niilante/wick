@@ -226,8 +226,6 @@ var FabricWickElements = function (wickEditor, fabricInterface) {
 
     var createFabricObjectFromWickObject = function (wickObj, callback) {
 
-        startTiming()
-
         if(cachedFabricObjects[wickObj.uuid]) {
             callback(cachedFabricObjects[wickObj.uuid]);
             return;
