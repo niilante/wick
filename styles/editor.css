@@ -82,7 +82,7 @@ select {
     color: #666;
     background-color: #585757;
 
-    border: 1px solid #878787;
+/*    border: 1px solid #878787;*/
 
 }
 
@@ -92,9 +92,11 @@ select {
     height: 30px;
     width: calc(100% - 2px);
     background-color: black;
+/*
     border-top-color: black;
     border-left-color: black;
     border-right-color: black;
+*/
 }
 .menubarTab {
     float:left;
@@ -234,8 +236,8 @@ select {
     text-align: left;
     padding: 3px;
     overflow: hidden;
-    border-left-color: #585757;
-    border-bottom-color: #585757;
+/*    border-left-color: #585757;*/
+/*    border-bottom-color: #585757;*/
 }
 
 #toolOptionsGUI {

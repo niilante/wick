@@ -67,13 +67,13 @@ TimelineInterface.Frame = function (wickEditor, timeline) {
         });
         this.elem.appendChild(extenderHandleRight);
         
-        var extenderHandleLeft = document.createElement('div');
-        extenderHandleLeft.className = "frame-extender-handle-left";
-        extenderHandleLeft.addEventListener('mousedown', function (e) {
-            timeline.interactions.start("dragFrameWidth", e, {frame:that});
-            e.stopPropagation();
-        });
-        that.elem.appendChild(extenderHandleLeft);
+//        var extenderHandleLeft = document.createElement('div');
+//        extenderHandleLeft.className = "frame-extender-handle-left";
+//        extenderHandleLeft.addEventListener('mousedown', function (e) {
+//            timeline.interactions.start("dragFrameWidth", e, {frame:that});
+//            e.stopPropagation();
+//        });
+//        that.elem.appendChild(extenderHandleLeft);
 //        @Todo Help me get Left handle working 
     }
 

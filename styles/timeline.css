@@ -26,7 +26,7 @@ body {
 	--layer-height: 40px;
 
 	--frame-width: 80px;
-	--frame-handle-width: 8px;
+	--frame-handle-width: 10px;
 
 	--frame-padding-width: 4px;
 	--frame-padding-height: 4px;
@@ -55,7 +55,7 @@ body {
 	padding: 0px;
     
 	width: 100%;
-    height: 100px; 
+    height: 100px;  
 
 	overflow: hidden;
 }
@@ -72,8 +72,8 @@ body {
 }
 
 .layers-container {
-	background-color: #585757;
-    border-right-color: #878787;
+	background-color: #414141;
+/*    border-right-color: #878787;*/
 	width: var(--layers-width);
 	height: 1000%;
 	left: 0px;
@@ -245,7 +245,7 @@ body {
 	overflow: hidden;
     margin-top: 7px;
     margin-left: 15px;
-	box-shadow: var(--border), var(--shadow);
+/*	box-shadow: var(--border), var(--shadow);*/
     
     border-radius: 3px;
 }
@@ -262,13 +262,13 @@ body {
 }
 
 .frame-extender-handle {
-	background-color: #000000;
+	background-color: #ffffff;
 
 	cursor: ew-resize;
 	width: var(--frame-handle-width);
 	height: 100%;
 
-	opacity: 0.1;
+/*	opacity: 0.1;*/
 
 	position: absolute;
 	right: 0px;
@@ -277,8 +277,15 @@ body {
 
 .frame-extender-handle-right {
 	float: right;
-    background-color: blue;
-}
+    background: rgba(249,221,0,0.34);
+    border-right: 2px solid #F9DE00;
+    border-top: 2px solid #F9DE00;
+    border-bottom: 2px solid #F9DE00;
+    box-sizing: border-box;    
+    border-top-right-radius: 0.8;
+    border-bottom-right-radius: 0.8; 
+    
+    }
 
 /*@ToDo create Left Frame handler grabbers*/
 
