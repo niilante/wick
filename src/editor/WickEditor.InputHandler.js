@@ -297,7 +297,8 @@ var InputHandler = function (wickEditor) {
 *************************/
 
     var loadSVG = function (svg, callback) {
-        console.error('loadSVG NYI!');
+        var pathWickObject = WickObject.fromPathFile(svg);
+        callback(pathWickObject);
     }
     
     var loadAnimatedGIF = function (dataURL, callback) {

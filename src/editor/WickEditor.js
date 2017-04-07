@@ -33,6 +33,9 @@ var WickEditor = function () {
         this.project = new WickProject();
     }
 
+    // Load settings
+    this.settings = new WickEditorSettings();
+
     // Load all interfaces
     this.interfaces = [];
     function registerInterface (interface) {

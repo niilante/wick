@@ -23,10 +23,11 @@ body {
     --max-timeline-height: 150px; 
 
 	--layers-width: 150px;
-	--layer-height: 40px;
+	--layer-height: 37px;
 
-	--frame-width: 80px;
-	--frame-handle-width: 10px;
+
+	--frame-width: 69px;
+	--frame-handle-width: 8px;
 
 	--frame-padding-width: 4px;
 	--frame-padding-height: 4px;
@@ -42,10 +43,10 @@ body {
 
     --frames-cell-first-padding: 5px;
 
-    --scrollbar-thickness: 18px;
+    --scrollbar-thickness: 14px;
 
 
-    --number-line-height: 20px;
+    --number-line-height: 16px;
 }
 
 .timeline {
@@ -96,50 +97,57 @@ body {
 
     background-color: #F0EFEF;
     
-    border-radius: 3px;
+    border-radius: 2px;
     margin-left: 5px;
-    
 
 	cursor: pointer;
 }
 
 .delete-layer-button {
-    position: relative;
-	left: calc(var(--scrollbar-thickness) + 5px);
+    position: absolute;
+	top: 5px;
+	left: 20px;
+
     background-image: url("/resources/minusButton.svg");
     background-repeat: no-repeat;
     background-position: left;
     text-overflow: clip;
     overflow: hidden;
     background-size: 12px 12px;
-    transition: width 0.5s;
-    transition-timing-function: cubic-bezier(steps(4));
+    /*transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));*/
 /*    clip: rect(10px, 20px, 30px, 40px);*/
 /*    display: inline;*/
-    z-index: 1;
+    /*z-index: 1;*/
 
     
 }
 
 .delete-layer-button:hover {
-    width: 100px;
+    /*width: 100px;*/
+    background-color: #31E19C;
 }
 .add-layer-button {
+	position: absolute;
+	top: 5px;
+	left: 0px;
+
     background-image: url(/resources/plusButton.svg);
     background-repeat: no-repeat;
     background-position: 50% 50%;
     background-size: 12px 12px;
     background-size: 12px 12px;
-    transition: width 0.5s;
-    transition-timing-function: cubic-bezier(steps(4));
-    z-index: 2;
+    /*transition: width 0.5s;
+    transition-timing-function: cubic-bezier(steps(4));*/
+    /*z-index: 2;*/
 }
 
 .add-layer-button:hover {
-    width: 100px;
+    /*width: 100px;
     z-index: 2;
     background-position: 5%;
-    background
+    background*/
+    background-color: #31E19C;
 }
 
 .layer {
@@ -247,12 +255,13 @@ body {
     margin-left: 15px;
 /*	box-shadow: var(--border), var(--shadow);*/
     
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .frame-thumbnail {
-	max-height:100%; 
-	max-width:100%;
+	max-height: 90%; 
+	max-width: 90%;
+	padding: 1px;
 
 	margin: auto;
 	display: block;
@@ -461,9 +470,27 @@ body {
 	position: absolute;
 	height: var(--number-line-height);
     color: #fafafa;
-    font-size: vmin;
+}
+
+.number-line-cell-number {
+	position: absolute;
+	top: 1px;
+	left: 10px;
+
+	font-size: 14px;
+	font-weight: bold;
+    /*font-size: vmin;*/
     font-family: "Anonymous Pro" ;
-    margin-top: 3px;
+}
+
+.number-line-cell-bar {
+	position: absolute;
+	top: 0px;
+	left: 5px;
+
+	width: 1px;
+	height: 100%;
+	background-color: white;
 }
 
 @font-face {
@@ -533,7 +560,7 @@ body {
 	height: var(--number-line-height);
 	top: 0px;
 	left: 0px;
-	background-color: #585757;
+	background-color: #252525;
 }
 
 .layer-toolbar {
@@ -544,7 +571,7 @@ body {
 	left: 0px;
 	border-top: 1px; 
 	border-color: black; 
-	background-color: #585757;
+	background-color: #252525;
 }
 
 .hide-scrollbar-connect-piece {
@@ -553,5 +580,5 @@ body {
 	height: var(--scrollbar-thickness);
 	bottom: 0px;
 	left: calc(100% - var(--scrollbar-thickness));
-	background-color: #585757;
+	background-color: #252525;
 }

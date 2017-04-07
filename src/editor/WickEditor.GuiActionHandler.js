@@ -546,6 +546,14 @@ var GuiActionHandler = function (wickEditor) {
             wickEditor.changeTool(wickEditor.tools.paintbrush);
         });
 
+    registerAction('useTools.line',
+        [],
+        [],
+        {},
+        function(args) {
+            wickEditor.changeTool(wickEditor.tools.line);
+        });
+
     registerAction('useTools.eraser',
         [],
         [],
@@ -554,7 +562,7 @@ var GuiActionHandler = function (wickEditor) {
             wickEditor.changeTool(wickEditor.tools.eraser);
         });
 
-    registerAction('useTools.fillBucket',
+    registerAction('useTools.fillbucket',
         [/*'F'*/],
         [],
         {},

@@ -41,7 +41,7 @@ Tools.Dropper = function (wickEditor) {
                 image.onload = function () {
                     var mouse = wickEditor.inputHandler.mouse;
                     var color = GetColorAtCoords(image, mouse.x*window.devicePixelRatio, mouse.y*window.devicePixelRatio, "hex");
-                    wickEditor.tools.paintbrush.color = color;
+                    wickEditor.settings.drawingColor = color;
                     wickEditor.syncInterfaces();
                 };
                 image.src = wickEditor.fabric.canvas.toDataURL();

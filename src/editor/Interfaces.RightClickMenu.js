@@ -21,7 +21,7 @@ var RightClickMenuInterface = function (wickEditor) {
 
     var menu;
 
-    var enabled = false;
+    var enabled = true;
 
 // menu object definitions
 
@@ -200,7 +200,9 @@ var RightClickMenuInterface = function (wickEditor) {
                     wickEditor.guiActionHandler.doAction("breakApart")
                 })
             ], function () {
-                return wickEditor.project.getNumSelectedObjects() === 1 && wickEditor.project.getSelectedObjects()[0].isSymbol;
+                var numSelections = wickEditor.project.getNumSelectedObjects();
+                var firstSelection = wickEditor.project.getSelectedObjects()[0];
+                return numSelections === 1 && firstSelection && firstSelection.isSymbol;
             }),
 
             // Frames selection

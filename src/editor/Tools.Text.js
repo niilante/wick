@@ -54,7 +54,7 @@ Tools.Text = function (wickEditor) {
             newWickObject.x = wickEditor.project.width/2;
             newWickObject.y = wickEditor.project.height/2;
         }
-        newWickObject.fontData.fill = wickEditor.tools.paintbrush.color;
+        newWickObject.fontData.fill = wickEditor.settings.drawingColor;
         wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
     }
 
