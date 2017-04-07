@@ -96,16 +96,17 @@ body {
 
     background-color: #F0EFEF;
     
-    border-radius: 3px;
+    border-radius: 2px;
     margin-left: 5px;
-    
 
 	cursor: pointer;
 }
 
 .delete-layer-button {
-    position: relative;
-	left: calc(var(--scrollbar-thickness) + 5px);
+    position: absolute;
+	top: 5px;
+	left: 20px;
+
     background-image: url("/resources/minusButton.svg");
     background-repeat: no-repeat;
     background-position: left;
@@ -116,7 +117,7 @@ body {
     transition-timing-function: cubic-bezier(steps(4));*/
 /*    clip: rect(10px, 20px, 30px, 40px);*/
 /*    display: inline;*/
-    z-index: 1;
+    /*z-index: 1;*/
 
     
 }
@@ -126,6 +127,10 @@ body {
     background-color: #31E19C;
 }
 .add-layer-button {
+	position: absolute;
+	top: 5px;
+	left: 0px;
+
     background-image: url(/resources/plusButton.svg);
     background-repeat: no-repeat;
     background-position: 50% 50%;
@@ -133,7 +138,7 @@ body {
     background-size: 12px 12px;
     /*transition: width 0.5s;
     transition-timing-function: cubic-bezier(steps(4));*/
-    z-index: 2;
+    /*z-index: 2;*/
 }
 
 .add-layer-button:hover {

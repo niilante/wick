@@ -93,7 +93,7 @@ TimelineInterface.Timeline = function (wickEditor) {
         addLayerButton.addEventListener('mousedown', function (e) {
             wickEditor.guiActionHandler.doAction('addLayer');
         });
-        hideLayersPiece.appendChild(addLayerButton);
+        this.elem.appendChild(addLayerButton);
 
         var deleteLayerButton = document.createElement('div');
         deleteLayerButton.className = 'layer-tools-button delete-layer-button tooltipElem';
@@ -101,7 +101,7 @@ TimelineInterface.Timeline = function (wickEditor) {
         deleteLayerButton.addEventListener('mousedown', function (e) {
             wickEditor.guiActionHandler.doAction('removeLayer');
         });
-        hideLayersPiece.appendChild(deleteLayerButton);
+        this.elem.appendChild(deleteLayerButton);
 
         this.horizontalScrollBar.build();
         this.elem.appendChild(this.horizontalScrollBar.elem);
