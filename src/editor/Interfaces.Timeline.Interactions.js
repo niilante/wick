@@ -89,7 +89,9 @@ TimelineInterface.Interactions = function (wickEditor, timeline) {
                 });
             });
 
-            wickEditor.actionHandler.doAction('moveFrames', {framesMoveActionData: framesMoveActionData});
+            wickEditor.actionHandler.doAction('moveFrames', {
+                framesMoveActionData: framesMoveActionData
+            });
 
         })
     }

@@ -23,9 +23,9 @@ body {
     --max-timeline-height: 150px; 
 
 	--layers-width: 150px;
-	--layer-height: 40px;
+	--layer-height: 37px;
 
-	--frame-width: 80px;
+	--frame-width: 69px;
 	--frame-handle-width: 8px;
 
 	--frame-padding-width: 4px;
@@ -249,7 +249,7 @@ body {
     margin-left: 15px;
 	box-shadow: var(--border), var(--shadow);
     
-    border-radius: 3px;
+    border-radius: 2px;
 }
 
 .frame-thumbnail {
@@ -547,7 +547,7 @@ body {
 	height: var(--number-line-height);
 	top: 0px;
 	left: 0px;
-	background-color: #585757;
+	background-color: #252525;
 }
 
 .layer-toolbar {
@@ -558,7 +558,7 @@ body {
 	left: 0px;
 	border-top: 1px; 
 	border-color: black; 
-	background-color: #585757;
+	background-color: #252525;
 }
 
 .hide-scrollbar-connect-piece {
@@ -567,5 +567,5 @@ body {
 	height: var(--scrollbar-thickness);
 	bottom: 0px;
 	left: calc(100% - var(--scrollbar-thickness));
-	background-color: #585757;
+	background-color: #252525;
 }

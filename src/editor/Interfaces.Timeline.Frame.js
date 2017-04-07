@@ -28,19 +28,21 @@ TimelineInterface.Frame = function (wickEditor, timeline) {
             timeline.framesContainer.update();*/
         });
         this.elem.addEventListener('mousedown', function (e) {
+
+            wickEditor.actionHandler.doAction('movePlayhead', {
+                obj: wickEditor.project.currentObject,
+                newPlayheadPosition: that.wickFrame.playheadPosition + Math.floor(e.offsetX / cssVar('--frame-width')),
+                newLayer: that.wickFrame.parentLayer
+            });
             if(!wickEditor.project.isObjectSelected(that.wickFrame)) {
-                wickEditor.actionHandler.doAction('movePlayhead', {
-                    obj: wickEditor.project.currentObject,
-                    newPlayheadPosition: that.wickFrame.playheadPosition,
-                    newLayer: that.wickFrame.parentLayer
-                });
-                wickEditor.project.clearSelection()
-                wickEditor.project.selectObject(that.wickFrame)
-                //timeline.framesContainer.update();
-                wickEditor.syncInterfaces()
+                wickEditor.project.clearSelection();
+                wickEditor.project.selectObject(that.wickFrame);
+                wickEditor.syncInterfaces();
             }
 
-            timeline.interactions.start("dragFrame", e, {frames:timeline.framesContainer.getFrames(wickEditor.project.getSelectedObjects())});
+            timeline.interactions.start("dragFrame", e, {
+                frames: timeline.framesContainer.getFrames(wickEditor.project.getSelectedObjects())
+            });
             
             if(e.button === 2) {
                 wickEditor.rightclickmenu.openMenu();
