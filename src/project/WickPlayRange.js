@@ -77,3 +77,16 @@ WickPlayRange.prototype.getLength = function () {
 	return this.end - this.start;
 
 }
+
+WickPlayRange.prototype.touchingPlayrange = function (other) {
+
+	var A = this;
+    var B = other;
+
+    return !(B.start >= A.end || B.end <= A.start);
+
+}
+
+
+
+

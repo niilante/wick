@@ -700,7 +700,8 @@ var WickActionHandler = function (wickEditor) {
                 }
             });
             if(touching) {
-                scrap();return;
+                scrap();
+                return;
             }
 
             wickEditor.project.currentObject.framesDirty = true;
@@ -751,14 +752,24 @@ var WickActionHandler = function (wickEditor) {
 
     registerAction('modifyPlayRange',
         function (args) {
-            args.oldStart = args.start;
-            args.oldEnd   = args.end;
-            
+            args.oldStart = args.playRange.start;
+            args.oldEnd   = args.playRange.end;
+
             if(args.start !== undefined && args.end !== undefined) {
                 args.playRange.changeStartAndEnd(args.start, args.end);
             } else {
                 if(args.start !== undefined) args.playRange.changeStart(args.start);
                 if(args.end   !== undefined) args.playRange.changeEnd  (args.end);
+            }
+
+            var touching = false;
+            wickEditor.project.getCurrentObject().playRanges.forEach(function (playRange) {
+                if(args.playRange === playRange) return;
+                if(args.playRange.touchingPlayrange(playRange)) touching = true;
+            });
+            if(touching) {
+                scrap(); 
+                return;
             }
 
             wickEditor.project.currentObject.framesDirty = true;
