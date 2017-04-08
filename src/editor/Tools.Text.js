@@ -46,7 +46,7 @@ Tools.Text = function (wickEditor) {
     }
 
     self.addText = function (x,y) {                                                     
-    	var newWickObject = WickObject.fromText('Click to edit text');
+    	var newWickObject = WickObject.createTextObject('Click to edit text');
         if(x && y) {
             newWickObject.x = x;
             newWickObject.y = y;
@@ -54,7 +54,7 @@ Tools.Text = function (wickEditor) {
             newWickObject.x = wickEditor.project.width/2;
             newWickObject.y = wickEditor.project.height/2;
         }
-        newWickObject.fontData.fill = wickEditor.settings.drawingColor;
+        newWickObject.textData.fill = wickEditor.settings.drawingColor;
         wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
     }
 

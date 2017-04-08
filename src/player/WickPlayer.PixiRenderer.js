@@ -167,9 +167,9 @@ var WickPixiRenderer = function () {
 
             pixiObject = new PIXI.Container();
 
-        } else if (wickObject.imageData) {
+        } else if (wickObject.asset && wickObject.asset.type === 'image') {
 
-            pixiObject = PIXI.Sprite.fromImage(wickObject.imageData);
+            pixiObject = PIXI.Sprite.fromImage(wickObject.asset.getData());
             //wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
 
         } else if (wickObject.pathData) {
@@ -182,15 +182,15 @@ var WickPixiRenderer = function () {
             pixiObject = PIXI.Sprite.fromImage(base64svg);
             //wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
 
-        } else if (wickObject.fontData) {
+        } else if (wickObject.textData) {
 
             var style = {
-                font : wickObject.fontData.fontWeight + " " + wickObject.fontData.fontStyle + " " + wickObject.fontData.fontSize + "px " + wickObject.fontData.fontFamily,
-                fill : wickObject.fontData.fill,
+                font : wickObject.textData.fontWeight + " " + wickObject.textData.fontStyle + " " + wickObject.textData.fontSize + "px " + wickObject.textData.fontFamily,
+                fill : wickObject.textData.fill,
                 wordWrap : true,
                 wordWrapWidth : 1440,
             };
-            pixiObject = new PIXI.Text(wickObject.fontData.text, style);
+            pixiObject = new PIXI.Text(wickObject.textData.text, style);
 
         }
 
@@ -220,7 +220,7 @@ var WickPixiRenderer = function () {
         var pixiObject = wickToPixiDict[wickObject.uuid];
         if(!pixiObject) return;
 
-        if(!wickObject.alphaMask && (wickObject.imageData || wickObject.pathData)) wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
+        if(!wickObject.alphaMask && wickObject.asset && (wickObject.asset.type === 'image' || wickObject.asset.type === 'path')) wickObject.generateAlphaMask(pixiObject.texture.baseTexture.imageUrl);
 
         pixiObject.visible = true;
         pixiObject.anchor = new PIXI.Point(0.5, 0.5);

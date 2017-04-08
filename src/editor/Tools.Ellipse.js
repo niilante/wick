@@ -54,7 +54,7 @@ Tools.Ellipse = function (wickEditor) {
 
         drawingShape.remove()
         
-        var pathWickObject = WickObject.fromPathFile(svgString);
+        var pathWickObject = WickObject.createPathObject(svgString);
         pathWickObject.x = origX;
         pathWickObject.y = origY;
         pathWickObject.width = drawingShape.width;

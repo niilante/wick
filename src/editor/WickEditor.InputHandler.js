@@ -297,7 +297,7 @@ var InputHandler = function (wickEditor) {
 *************************/
 
     var loadSVG = function (svg, callback) {
-        var pathWickObject = WickObject.fromPathFile(svg);
+        var pathWickObject = WickObject.createPathObject(svg);
         callback(pathWickObject);
     }
     
@@ -347,8 +347,12 @@ var InputHandler = function (wickEditor) {
         newGifEl.src = dataURL;
     }
 
-    var loadImage = function (src, callback) {
-        callback(WickObject.fromImage(src));
+    var loadImage = function (src, filename, callback) {
+        var asset = new WickAsset(src, 'image', filename);
+        var wickObj = new WickObject();
+        wickObj.assetUUID = wickEditor.project.library.addAsset(asset);
+        
+        callback(wickObj);
     }
 
     var loadAudio = function (src, callback) {
@@ -425,7 +429,9 @@ var InputHandler = function (wickEditor) {
                 return;
             }
 
-            fromContstructors[fileType](fr.result, function (newWickObject) {
+            var filenameNoExt = file.name.split('.')[0];
+
+            fromContstructors[fileType](fr.result, filenameNoExt, function (newWickObject) {
                 var m
                 if(e && e.originalEvent && e.originalEvent.clientX) {
                     m = wickEditor.fabric.screenToCanvasSpace(e.originalEvent.clientX, e.originalEvent.clientY);

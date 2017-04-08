@@ -231,16 +231,16 @@ var FabricWickElements = function (wickEditor, fabricInterface) {
             return;
         }
 
-        if(wickObj.imageData) {
-            fabric.Image.fromURL(wickObj.imageData, function(newFabricImage) {
+        if(wickObj.asset && wickObj.asset.type === 'image') {
+            fabric.Image.fromURL(wickObj.asset.getData(), function(newFabricImage) {
                 cachedFabricObjects[wickObj.uuid] = newFabricImage;
                 newFabricImage.wickObjReference = wickObj;
                 callback(newFabricImage);
             });
         }
 
-        if(wickObj.fontData) {
-            var newFabricText = new fabric.IText(wickObj.fontData.text, wickObj.fontData);
+        if(wickObj.textData) {
+            var newFabricText = new fabric.IText(wickObj.textData.text, wickObj.textData);
             newFabricText.wickObjReference = wickObj;
             callback(newFabricText);
         }
@@ -369,13 +369,7 @@ var FabricWickElements = function (wickEditor, fabricInterface) {
     var updateFabObjPositioning = function (fabricObj, wickObj) {
 
         wickObj.fabricObjectReference = fabricObj
-
-        // To get pixel-perfect positioning to avoid blurry images (this happens when an image has a fractional position)
-        /*if(wickObj.imageData) {
-            wickObj.x = Math.round(wickObj.x);
-            wickObj.y = Math.round(wickObj.y);
-        }*/
-
+        
         // Some wick objects don't have a defined width/height until rendered by fabric. (e.g. paths and text)
         if(!wickObj.width) wickObj.width = fabricObj.width;
         if(!wickObj.height) wickObj.height = fabricObj.height;
@@ -397,14 +391,14 @@ var FabricWickElements = function (wickEditor, fabricInterface) {
         fabricObj.flipY   = wickObj.flipY;
         fabricObj.opacity = wickObj.opacity;
 
-        if(wickObj.fontData) {
-            fabricObj.text = wickObj.fontData.text;
-            fabricObj.fontFamily = wickObj.fontData.fontFamily;
-            fabricObj.setColor(wickObj.fontData.fill);
-            fabricObj.fontSize = wickObj.fontData.fontSize;
-            fabricObj.fontStyle = wickObj.fontData.fontStyle;
-            fabricObj.fontWeight = wickObj.fontData.fontWeight;
-            fabricObj.textDecoration = wickObj.fontData.textDecoration;
+        if(wickObj.textData) {
+            fabricObj.text = wickObj.textData.text;
+            fabricObj.fontFamily = wickObj.textData.fontFamily;
+            fabricObj.setColor(wickObj.textData.fill);
+            fabricObj.fontSize = wickObj.textData.fontSize;
+            fabricObj.fontStyle = wickObj.textData.fontStyle;
+            fabricObj.fontWeight = wickObj.textData.fontWeight;
+            fabricObj.textDecoration = wickObj.textData.textDecoration;
         } else {
             if(wickObj.opacity > 0) {
                 fabricObj.perPixelTargetFind = true;

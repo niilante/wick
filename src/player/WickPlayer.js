@@ -161,7 +161,7 @@ var WickPlayer = function () {
 
         // TOXXXIC
         //console.log("-------------");
-        var blacklist = ['alphaMask', 'pixiSprite', 'pixiContainer', 'pixiText', 'imageData', 'audioData', 'wickScripts', 'parentObject', 'layers'];
+        var blacklist = ['asset', 'alphaMask', 'pixiSprite', 'pixiContainer', 'pixiText', 'audioData', 'wickScripts', 'parentObject', 'layers'];
         for (var name in wickObject) {
             if (name !== 'undefined' && wickObject.hasOwnProperty(name) && blacklist.indexOf(name) === -1) {
                 if(initialStateObject[name] !== wickObject[name]) {

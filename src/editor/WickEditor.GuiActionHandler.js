@@ -936,10 +936,10 @@ var GuiActionHandler = function (wickEditor) {
         [],
         {},
         function (args) {
-            var newWickObject = WickObject.fromText('Click to edit text');
+            var newWickObject = WickObject.createTextObject('Click to edit text');
             newWickObject.x = wickEditor.project.width/2;
             newWickObject.y = wickEditor.project.height/2;
-            newWickObject.fontData.fill = '#000000';
+            newWickObject.textData.fill = '#000000';
             wickEditor.actionHandler.doAction('addObjects', {wickObjects:[newWickObject]});
         });
 

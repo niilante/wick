@@ -53,8 +53,10 @@ WickProject.Exporter = (function () {
             "src/project/WickFrame.js",
             "src/project/WickLayer.js",
             "src/project/WickObject.js",
+            "src/project/WickAsset.js",
             "src/project/WickPlayRange.js",
             "src/project/WickProject.js",
+            "src/project/WickProject.AssetLibrary.js",
             "src/project/WickProject.Compressor.js",
             "src/player/WickPlayer.Preloader.js",
             "src/player/WickPlayer.PixiRenderer.js",
@@ -156,6 +158,7 @@ WickProject.Exporter = (function () {
         "parentLayer",
         "parentFrame",
         "causedAnException",
+        "asset",
     ];
 
     projectExporter.JSONReplacer = function(key, value) {

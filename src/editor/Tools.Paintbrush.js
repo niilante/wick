@@ -86,7 +86,7 @@ Tools.Paintbrush = function (wickEditor) {
                     var x = fabricPath.left// - symbolOffset.x;
                     var y = fabricPath.top// - symbolOffset.y;
 
-                    var pathWickObject = WickObject.fromPathFile(SVGData);
+                    var pathWickObject = WickObject.createPathObject(SVGData);
                     pathWickObject.x = x;
                     pathWickObject.y = y;
 

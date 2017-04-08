@@ -25,6 +25,8 @@ var WickProject = function () {
     this.currentObject = this.rootObject;
     this.rootObject.currentFrame = 0;
 
+    this.library = new AssetLibrary();
+
     this.name = "NewProject";
 
     this.onionSkinning = false;
@@ -138,12 +140,15 @@ WickProject.fromJSON = function (rawJSONProject) {
     // Put prototypes back on object ('class methods'), they don't get JSONified on project export.
     projectFromJSON.__proto__ = WickProject.prototype;
     WickObject.addPrototypes(projectFromJSON.rootObject);
+    projectFromJSON.library.__proto__ = AssetLibrary.prototype;
+    AssetLibrary.addPrototypes(projectFromJSON.library);
 
     // Decode scripts back to human-readble and eval()-able format
     projectFromJSON.rootObject.decodeStrings();
 
     // Add references to wickobject's parents (optimization)
     projectFromJSON.rootObject.generateParentObjectReferences();
+    projectFromJSON.regenAssetReferences();
 
     // Start at the first from of the root object
     projectFromJSON.currentObject = projectFromJSON.rootObject;
@@ -616,8 +621,20 @@ WickProject.prototype.loadScriptOfObject = function (obj) {
     };
 }
 
+WickProject.prototype.regenAssetReferences = function () {
+
+    var self = this;
+
+    self.getAllObjects().forEach(function (obj) {
+        obj.asset = self.library.getAsset(obj.assetUUID);
+    });
+
+}
+
 WickProject.prototype.prepareForPlayer = function () {
     var self = this;
+
+    self.regenAssetReferences();
 
     self.getAllObjects().forEach(function (obj) {
         obj.prepareForPlayer();

@@ -449,7 +449,7 @@ var FabricInterface = function (wickEditor) {
 
     this.forceModifySelectedObjects = function () {
         var wickObj = self.getSelectedObject(WickObject);
-        if(wickObj && wickObj.fontData) {
+        if(wickObj && wickObj.textData) {
             self.modifyObjects([wickObj]);
         }
         wickEditor.syncInterfaces();

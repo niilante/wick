@@ -80,6 +80,7 @@ var WickActionHandler = function (wickEditor) {
     var done = function () {
         // Sync interfaces + do other post-action cleanup
         wickEditor.project.rootObject.generateParentObjectReferences();
+        wickEditor.project.regenAssetReferences();
         wickEditor.syncInterfaces();
         wickEditor.fabric.canvas.renderAll();
     }
@@ -267,15 +268,15 @@ var WickActionHandler = function (wickEditor) {
                 });
 
                 // This is silly what's a better way ???
-                if(wickObj.fontData) {
+                if(wickObj.textData) {
                     wickObj.forceFabricCanvasRegen = true;
-                    args.originalStates[i].text = wickObj.fontData.text;
-                    args.originalStates[i].fontFamily = wickObj.fontData.fontFamily;
-                    args.originalStates[i].fontSize = wickObj.fontData.fontSize;
-                    args.originalStates[i].fontWeight = wickObj.fontData.fontWeight;
-                    args.originalStates[i].fontStyle = wickObj.fontData.fontStyle;
-                    args.originalStates[i].textDecoration = wickObj.fontData.textDecoration;
-                    args.originalStates[i].fill = wickObj.fontData.fill;
+                    args.originalStates[i].text = wickObj.textData.text;
+                    args.originalStates[i].fontFamily = wickObj.textData.fontFamily;
+                    args.originalStates[i].fontSize = wickObj.textData.fontSize;
+                    args.originalStates[i].fontWeight = wickObj.textData.fontWeight;
+                    args.originalStates[i].fontStyle = wickObj.textData.fontStyle;
+                    args.originalStates[i].textDecoration = wickObj.textData.textDecoration;
+                    args.originalStates[i].fill = wickObj.textData.fill;
                 }
 
                 modifyableAttributes.forEach(function(attrib) {
@@ -285,14 +286,14 @@ var WickActionHandler = function (wickEditor) {
                 });
                 
                 // This is silly what's a better way ???
-                if(wickObj.fontData) {
-                    if(args.modifiedStates[i].text) wickObj.fontData.text = args.modifiedStates[i].text;
-                    if(args.modifiedStates[i].fontFamily) wickObj.fontData.fontFamily = args.modifiedStates[i].fontFamily;
-                    if(args.modifiedStates[i].fontSize) wickObj.fontData.fontSize = args.modifiedStates[i].fontSize;
-                    if(args.modifiedStates[i].fontWeight) wickObj.fontData.fontWeight = args.modifiedStates[i].fontWeight;
-                    if(args.modifiedStates[i].fontStyle) wickObj.fontData.fontStyle = args.modifiedStates[i].fontStyle;
-                    if(args.modifiedStates[i].textDecoration) wickObj.fontData.textDecoration = args.modifiedStates[i].textDecoration;
-                    if(args.modifiedStates[i].fill) wickObj.fontData.fill = args.modifiedStates[i].fill;
+                if(wickObj.textData) {
+                    if(args.modifiedStates[i].text) wickObj.textData.text = args.modifiedStates[i].text;
+                    if(args.modifiedStates[i].fontFamily) wickObj.textData.fontFamily = args.modifiedStates[i].fontFamily;
+                    if(args.modifiedStates[i].fontSize) wickObj.textData.fontSize = args.modifiedStates[i].fontSize;
+                    if(args.modifiedStates[i].fontWeight) wickObj.textData.fontWeight = args.modifiedStates[i].fontWeight;
+                    if(args.modifiedStates[i].fontStyle) wickObj.textData.fontStyle = args.modifiedStates[i].fontStyle;
+                    if(args.modifiedStates[i].textDecoration) wickObj.textData.textDecoration = args.modifiedStates[i].textDecoration;
+                    if(args.modifiedStates[i].fill) wickObj.textData.fill = args.modifiedStates[i].fill;
                 }
                 
                 // This is silly what's a better way ???
@@ -317,15 +318,15 @@ var WickActionHandler = function (wickEditor) {
                 });
 
                 // This is silly what's a better way ???
-                if(wickObj.fontData) {
+                if(wickObj.textData) {
                     wickObj.forceFabricCanvasRegen = true;
-                    wickObj.fontData.text = args.originalStates[i].text;
-                    wickObj.fontData.fontFamily = args.originalStates[i].fontFamily;
-                    wickObj.fontData.fontSize = args.originalStates[i].fontSize;
-                    wickObj.fontData.fontStyle = args.originalStates[i].fontStyle;
-                    wickObj.fontData.fontWeight = args.originalStates[i].fontWeight;
-                    wickObj.fontData.textDecoration = args.originalStates[i].textDecoration;
-                    wickObj.fontData.fill = args.originalStates[i].fill;
+                    wickObj.textData.text = args.originalStates[i].text;
+                    wickObj.textData.fontFamily = args.originalStates[i].fontFamily;
+                    wickObj.textData.fontSize = args.originalStates[i].fontSize;
+                    wickObj.textData.fontStyle = args.originalStates[i].fontStyle;
+                    wickObj.textData.fontWeight = args.originalStates[i].fontWeight;
+                    wickObj.textData.textDecoration = args.originalStates[i].textDecoration;
+                    wickObj.textData.fill = args.originalStates[i].fill;
                 }
             }
 
@@ -958,7 +959,7 @@ var WickActionHandler = function (wickEditor) {
 
             var superPathString = superPath.exportSVG({asString:true});
             var svgString = '<svg id="svg" version="1.1" width="'+superPath.bounds._width+'" height="'+superPath.bounds._height+'" xmlns="http://www.w3.org/2000/svg">' +superPathString+ '</svg>'
-            var superPathWickObject = WickObject.fromPathFile(svgString);
+            var superPathWickObject = WickObject.createPathObject(svgString);
             superPathWickObject.x = superPath.position.x;
             superPathWickObject.y = superPath.position.y;
 

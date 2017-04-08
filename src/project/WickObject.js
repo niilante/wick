@@ -47,13 +47,13 @@ var WickObject = function () {
 
 // Static
 
-    // Data, only used by static objects
-    this.imageData = undefined;
-    this.fontData  = undefined;
-    this.audioData = undefined;
-    this.pathData  = undefined;
-
+    this.assetUUID = null;
     this.volume = 1.0;
+
+// Text
+
+    this.isText = false;
+    this.textData = false;
 
 // Symbols
 
@@ -102,18 +102,20 @@ WickObject.fromJSONArray = function (jsonArrayObject) {
     return newWickObjects;
 }
 
-WickObject.fromImage = function (imgSrc) {
-
+WickObject.createPathObject = function (svg) {
     var obj = new WickObject();
-    obj.imageData = imgSrc;
-    return obj;
+    obj.isPath = true;
+    obj.pathData = svg;
 
+    return obj;
 }
 
-WickObject.fromText = function (text) {
+WickObject.createTextObject = function (text) {
     var obj = new WickObject();
 
-    obj.fontData = {
+    obj.isText = true;
+
+    obj.textData = {
         //backgroundColor: undefined,
         //borderColor: undefined,
         //borderDashArray: undefined,
@@ -146,24 +148,6 @@ WickObject.fromText = function (text) {
     };
 
     return obj;
-}
-
-WickObject.fromAudioFile = function (audioData) {
-    var audioWickObject = new WickObject();
-
-    audioWickObject.audioData = audioData;
-    audioWickObject.autoplaySound = true;
-    audioWickObject.loopSound = false;
-    audioWickObject.width = 75;
-    audioWickObject.height = 75;
-
-    return audioWickObject;
-}
-
-WickObject.fromPathFile = function (pathData) {
-    var pathWickObject = new WickObject();
-    pathWickObject.pathData = pathData;
-    return pathWickObject;
 }
 
 WickObject.createNewSymbol = function () {
@@ -269,6 +253,7 @@ WickObject.prototype.copy = function () {
     copiedObject.flipY = this.flipY;
     copiedObject.opacity = this.opacity;
     copiedObject.uuid = random.uuid4();
+    copiedObject.assetUUID = this.assetUUID;
 
     //copiedObject.tweens = ; // TODO: Copy tweens!!!
 
@@ -287,10 +272,6 @@ WickObject.prototype.copy = function () {
         });
     } else {
         copiedObject.isSymbol = false;
-
-        copiedObject.imageData = this.imageData;
-        copiedObject.fontData = this.fontData;
-        copiedObject.pathData = this.pathData;
     }
 
     return copiedObject;
@@ -356,8 +337,11 @@ WickObject.prototype.downloadAsFile = function () {
       // return bb.getBlob(mimeString);
     }
 
-    if(this.imageData) {
-        saveAs(dataURItoBlob(this.imageData), filename+".jpg");
+    var asset = wickEditor.project.library.getAsset(this.assetUUID);
+
+    if(asset.type === 'image') {
+        var ext = asset.getData().split("/")[1].split(';')[0];
+        saveAs(dataURItoBlob(asset.getData()), filename+"."+ext);
         return;
     }
 
@@ -407,8 +391,8 @@ WickObject.prototype.encodeStrings = function () {
         this.wickScript = WickProject.Compressor.encodeString(this.wickScript);
     }
 
-    if(this.fontData) {
-        this.fontData.text = WickProject.Compressor.encodeString(this.fontData.text);
+    if(this.textData) {
+        this.textData.text = WickProject.Compressor.encodeString(this.textData.text);
     }
 
     if(this.pathData) {
@@ -434,8 +418,8 @@ WickObject.prototype.decodeStrings = function () {
         this.wickScript = WickProject.Compressor.decodeString(this.wickScript);
     }
 
-    if(this.fontData) {
-        this.fontData.text = WickProject.Compressor.decodeString(this.fontData.text);
+    if(this.textData) {
+        this.textData.text = WickProject.Compressor.decodeString(this.textData.text);
     }
 
     if(this.pathData) {
@@ -1361,7 +1345,7 @@ WickObject.prototype.generateAlphaMask = function (imageData) {
 
     var that = this;
 
-    var alphaMaskSrc = imageData || that.imageData;
+    var alphaMaskSrc = imageData || that.asset.getData();
     if(!alphaMaskSrc) return;
 
     ImageToCanvas(alphaMaskSrc, function (canvas,ctx) {
@@ -1478,7 +1462,7 @@ WickObject.prototype.tick = function () {
         }
     }
 
-    if(this.fontData) {
+    if(this.textData) {
         if(this.varName) {
             (wickEditor || wickPlayer).project.loadBuiltinFunctions(this);
             this.setText(eval(this.varName));
