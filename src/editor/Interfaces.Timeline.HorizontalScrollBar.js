@@ -34,7 +34,7 @@ TimelineInterface.HorizontalScrollBar = function (wickEditor, timeline) {
         });
         this.elem.appendChild(rightButton);
 
-        scrollbar = new Scrollbar(10, 10000);
+        scrollbar = new Scrollbar(10, 10);
         setTimeout(function () {
             scrollbar.setViewboxSize(that.elem.offsetWidth)
         }, 100);
@@ -46,6 +46,11 @@ TimelineInterface.HorizontalScrollBar = function (wickEditor, timeline) {
     }
 
     this.update = function () {
+        var frameCount = wickEditor.project.getCurrentObject().getTotalTimelineLength();
+        var buffer = 2000;
+        var contentSize = frameCount * cssVar('--frame-width') + buffer;
+        console.log(contentSize)
+        scrollbar.setContentSize(contentSize)
         head.style.marginLeft = scrollbar.barPosition + cssVar('--scrollbar-thickness') + 'px';
         head.style.width = scrollbar.barSize + 'px';
     }
