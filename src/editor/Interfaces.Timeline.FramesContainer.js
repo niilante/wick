@@ -90,7 +90,8 @@ TimelineInterface.FramesContainer = function (wickEditor, timeline) {
         });
         this.playhead.update();
 
-        $('.frames-container').css('left', timeline.horizontalScrollBar.scrollAmount+cssVar('--layers-width')+'px');
+        var scrollX = -timeline.horizontalScrollBar.getScrollPosition();
+        $('.frames-container').css('left', scrollX+cssVar('--layers-width')+'px');
         $('.frames-container').css('top', timeline.verticalScrollBar.scrollAmount+'px');
         $('.layers-container').css('top', timeline.verticalScrollBar.scrollAmount+'px');
     }

@@ -7,13 +7,11 @@ TimelineInterface.HorizontalScrollBar = function (wickEditor, timeline) {
     var rightButton;
     var head;
 
-    this.scrollAmount;
+    var scrollbar;
 
     this.build = function () {
         this.elem = document.createElement('div');
         this.elem.className = 'scrollbar horizontal-scrollbar';
-
-        that.scrollAmount = 0;
 
         head = document.createElement('div');
         head.className = 'scrollbar-head scrollbar-head-horizontal';
@@ -35,16 +33,33 @@ TimelineInterface.HorizontalScrollBar = function (wickEditor, timeline) {
             that.scroll(-20);
         });
         this.elem.appendChild(rightButton);
+
+        scrollbar = new Scrollbar(10, 10000);
+        setTimeout(function () {
+            scrollbar.setViewboxSize(that.elem.offsetWidth)
+        }, 100);
+
+        $(window).resize(function() {
+            scrollbar.setViewboxSize(that.elem.offsetWidth);
+            that.update()
+        });
     }
 
     this.update = function () {
-        head.style.marginLeft = -that.scrollAmount + cssVar('--scrollbar-thickness') + 'px';
+        head.style.marginLeft = scrollbar.barPosition + cssVar('--scrollbar-thickness') + 'px';
+        head.style.width = scrollbar.barSize + 'px';
+
+        console.log(scrollbar.barPosition)
     }
 
     this.scroll = function (scrollAmt) {
-        that.scrollAmount = Math.min(that.scrollAmount + scrollAmt, 0);
+        scrollbar.setBarPosition(scrollbar.barPosition + scrollAmt);
         timeline.framesContainer.update();
         timeline.numberLine.update();
         that.update();
+    }
+
+    this.getScrollPosition = function () {
+        return scrollbar.viewboxPosition;
     }
 }
