@@ -60,6 +60,8 @@ var FabricShapeDrawer = function (wickEditor, fabricInterface) {
                 ry: 3,
                 fill : wickEditor.settings.drawingColor
             });
+            drawingShape.__originalLeft = drawingShape.left;
+            drawingShape.__originalTop = drawingShape.top;
         }
 
         fabricInterface.canvas.add(drawingShape);
@@ -76,9 +78,19 @@ var FabricShapeDrawer = function (wickEditor, fabricInterface) {
                 drawingShape.width  = Math.abs(shapeStartPos.x - screenXY.x);
                 drawingShape.height = Math.abs(shapeStartPos.y - screenXY.y);
             } else if(drawingShape.type === 'ellipse') {
-                var newRx = Math.abs(drawingShape.left - screenXY.x);
-                var newRy = Math.abs(drawingShape.top  - screenXY.y);
-                drawingShape.set({ rx: newRx, ry: newRy });
+
+                var newRx = Math.abs(drawingShape.__originalLeft - screenXY.x);
+                var newRy = Math.abs(drawingShape.__originalTop  - screenXY.y);
+                
+                var nx = drawingShape.__originalLeft > screenXY.x ? 1 : -1;
+                var ny = drawingShape.__originalTop  > screenXY.y ? 1 : -1;
+
+                drawingShape.set({ 
+                    left: drawingShape.__originalLeft - newRx/2 * nx,
+                    top: drawingShape.__originalTop - newRy/2 * ny,
+                    rx: newRx/2, 
+                    ry: newRy/2,
+                });
             }
             fabricInterface.canvas.renderAll();
         }
