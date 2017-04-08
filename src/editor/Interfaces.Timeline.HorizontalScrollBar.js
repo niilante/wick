@@ -48,8 +48,6 @@ TimelineInterface.HorizontalScrollBar = function (wickEditor, timeline) {
     this.update = function () {
         head.style.marginLeft = scrollbar.barPosition + cssVar('--scrollbar-thickness') + 'px';
         head.style.width = scrollbar.barSize + 'px';
-
-        console.log(scrollbar.barPosition)
     }
 
     this.scroll = function (scrollAmt) {
