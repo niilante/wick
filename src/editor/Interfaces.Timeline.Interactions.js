@@ -215,8 +215,7 @@ TimelineInterface.Interactions = function (wickEditor, timeline) {
             
         }), 
         'update' : (function (e) {
-            timeline.verticalScrollBar.scroll(-e.movementY)
-            timeline.verticalScrollBar.update();
+            timeline.verticalScrollBar.scroll(e.movementY);
         }),
         'finish' : (function (e) {
             

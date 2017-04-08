@@ -91,9 +91,10 @@ TimelineInterface.FramesContainer = function (wickEditor, timeline) {
         this.playhead.update();
 
         var scrollX = -timeline.horizontalScrollBar.getScrollPosition();
-        $('.frames-container').css('left', scrollX+cssVar('--layers-width')+'px');
-        $('.frames-container').css('top', timeline.verticalScrollBar.scrollAmount+'px');
-        $('.layers-container').css('top', timeline.verticalScrollBar.scrollAmount+'px');
+        var scrollY = -timeline.verticalScrollBar.getScrollPosition();
+        $('.frames-container').css('left', scrollX+cssVar('--layers-width')      +'px');
+        $('.frames-container').css('top',  scrollY+cssVar('--number-line-height')+'px');
+        $('.layers-container').css('top',  scrollY+cssVar('--number-line-height')+'px');
     }
 
     this.getFrames = function (wickFrames) {

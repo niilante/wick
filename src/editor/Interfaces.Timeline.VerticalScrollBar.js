@@ -7,13 +7,11 @@ TimelineInterface.VerticalScrollBar = function (wickEditor, timeline) {
     var bottomButton
     var head;
 
-    that.scrollAmount;
+    var scrollbar;
 
     this.build = function () {
         this.elem = document.createElement('div');
         this.elem.className = 'scrollbar vertical-scrollbar';
-
-        that.scrollAmount = cssVar('--number-line-height');
 
         head = document.createElement('div');
         head.className = 'scrollbar-head scrollbar-head-vertical';
@@ -35,22 +33,38 @@ TimelineInterface.VerticalScrollBar = function (wickEditor, timeline) {
             that.scroll(-20)
         });
         this.elem.appendChild(bottomButton);
-    }
+
+        scrollbar = new Scrollbar(10, 100, 300);
+    },
 
     this.update = function () {
         var nLayers = wickEditor.project.getCurrentObject().layers.length;
 
-        this.elem.style.display = nLayers > 3 ? 'block' : 'none';
+        if(nLayers < 4) {
+            this.elem.style.display = 'none';
+            return;
+        }
+        this.elem.style.display = 'block';
 
-        head.style.height = parseInt(timeline.elem.style.height)/4 + 'px';
-        head.style.marginTop = -that.scrollAmount + cssVar('--scrollbar-thickness') + cssVar('--number-line-height') + 'px';
+        //head.style.height = parseInt(timeline.elem.style.height)/4 + 'px';
+        //head.style.marginTop = scrollbar.barPosition + cssVar('--scrollbar-thickness') + cssVar('--number-line-height') + 'px';
+    
+        scrollbar.setScrollbarContainerSize(that.elem.offsetHeight);
+        scrollbar.setViewboxSize(that.elem.offsetHeight-10);
+        console.log(that.elem.offsetHeight)
+        var contentSize = nLayers * cssVar('--layer-height');
+        scrollbar.setContentSize(contentSize);
+        head.style.marginTop = scrollbar.barPosition + cssVar('--scrollbar-thickness') + 'px';
+        head.style.height = scrollbar.barSize - 30 + 'px';
     }
 
     this.scroll = function (scrollAmt) {
-        if(wickEditor.project.getCurrentObject().layers.length < 4) return;
-
-        that.scrollAmount = Math.min(that.scrollAmount + scrollAmt, cssVar('--number-line-height'));
+        scrollbar.setBarPosition(scrollbar.barPosition+scrollAmt);
         timeline.framesContainer.update();
         that.update();
+    }
+
+    this.getScrollPosition = function () {
+        return scrollbar.viewboxPosition;
     }
 }

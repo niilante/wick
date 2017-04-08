@@ -179,7 +179,6 @@ WickProject.fixForBackwardsCompatibility = function (project) {
         });
     });*/
 
-    console.log(project.library)
     if(!project.library) {
         project.library = new AssetLibrary();
 
