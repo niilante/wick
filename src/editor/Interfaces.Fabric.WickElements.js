@@ -265,9 +265,7 @@ var FabricWickElements = function (wickEditor, fabricInterface) {
             var children = wickObj.getAllActiveChildObjects();
             var group = new fabric.Group();
             var wos = {};
-
-
-
+            
             for(var i = 0; i < children.length; i++) {
                 
                 var setupSymbol = function () {

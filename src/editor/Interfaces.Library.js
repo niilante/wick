@@ -19,30 +19,34 @@ var LibraryInterface = function (wickEditor) {
 
     this.setup = function () {
         $("#tree").fancytree();
-
-        var obj = [
-            { title: "Lazy node 1", lazy: true },
-            { title: "Lazy node 2", lazy: true },
-            { title: "Folder node 3", folder: true,
-              children: [
-                { title: "node 3.1" },
-                { title: "node 3.2",
-                  children: [
-                    { title: "node 3.2.1" },
-                    { title: "node 3.2.2",
-                      children: [
-                        { title: "node 3.2.2.1" }
-                      ]
-                    }
-                  ]
-                }
-              ]
-            }
-        ];
-        $("#tree").fancytree("getRootNode").addChildren(obj);
     }
 
     this.syncWithEditorState = function () {
+        this.clear();
+        this.populate();
+    }
+
+    this.populate = function () {
+
+        var newTreeChildren = [];
+
+        var library = wickEditor.project.library;
+        for (uuid in library.assets) {
+            var asset = library.assets[uuid];
+            newTreeChildren.push({ title: asset.filename });
+        }
+
+        $("#tree").fancytree("getRootNode").addChildren(newTreeChildren);
+
+    }
+
+    this.clear = function () {
+
+        var node = $("#tree").fancytree("getRootNode");
+
+        while( node.hasChildren() ) {
+            node.getFirstChild().remove();
+        }
         
     }
 
