@@ -23,14 +23,14 @@ TimelineInterface.HorizontalScrollBar = function (wickEditor, timeline) {
         leftButton = document.createElement('div');
         leftButton.className = 'scrollbar-button scrollbar-button-left';
         leftButton.addEventListener('mousedown', function (e) {
-            that.scroll(20);
+            that.scroll(-10);
         });
         this.elem.appendChild(leftButton);
 
         rightButton = document.createElement('div');
         rightButton.className = 'scrollbar-button scrollbar-button-right';
         rightButton.addEventListener('mousedown', function (e) {
-            that.scroll(-20);
+            that.scroll(10);
         });
         this.elem.appendChild(rightButton);
 

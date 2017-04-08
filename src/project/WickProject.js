@@ -140,6 +140,8 @@ WickProject.fromJSON = function (rawJSONProject) {
     // Put prototypes back on object ('class methods'), they don't get JSONified on project export.
     projectFromJSON.__proto__ = WickProject.prototype;
     WickObject.addPrototypes(projectFromJSON.rootObject);
+
+    WickProject.fixForBackwardsCompatibility(projectFromJSON);
     projectFromJSON.library.__proto__ = AssetLibrary.prototype;
     AssetLibrary.addPrototypes(projectFromJSON.library);
 
@@ -155,8 +157,6 @@ WickProject.fromJSON = function (rawJSONProject) {
     projectFromJSON.rootObject.playheadPosition = 0;
     projectFromJSON.currentObject.currentLayer = 0;
 
-    WickProject.fixForBackwardsCompatibility(projectFromJSON);
-
     projectFromJSON.currentObject = projectFromJSON.rootObject;
 
     // Regenerate name refs
@@ -170,14 +170,27 @@ WickProject.fixForBackwardsCompatibility = function (project) {
 
     var allObjectsInProject = project.rootObject.getAllChildObjectsRecursive();
     allObjectsInProject.push(project.rootObject);
-    allObjectsInProject.forEach(function (wickObj) {
+    /*allObjectsInProject.forEach(function (wickObj) {
         if(!wickObj.isSymbol) return
         wickObj.layers.forEach(function (layer) {
             layer.frames.forEach(function (frame) {
                 
             });
         });
-    });
+    });*/
+
+    console.log(project.library)
+    if(!project.library) {
+        project.library = new AssetLibrary();
+
+        allObjectsInProject.forEach(function (wickObject) {
+            if(wickObject.imageData) {
+                var asset = new WickAsset(wickObject.imageData, 'image', 'untitled');
+                wickObject.assetUUID = wickEditor.project.library.addAsset(asset);
+                wickObject.imageData = null;
+            }
+        })
+    }
 
 }
 
