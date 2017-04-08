@@ -35,7 +35,7 @@ var FabricInterface = function (wickEditor) {
         /* Setting objectCaching to false fixes some rendering problems with
            symbol centerpoints and speeds up zooming by a lot */
         /* Currently set to true because it makes moving between frames much faster...  */
-        fabric.Object.prototype.objectCaching = true;
+        fabric.Object.prototype.objectCaching = false;
 
         this.panning = false;
         this.onionSkinsDirty = false;
@@ -203,14 +203,14 @@ var FabricInterface = function (wickEditor) {
         }
     }
 
-    this.zoom = function (zoomAmount) {
+    this.zoom = function (zoomAmount, zoomX, zoomY) {
         // Calculate new zoom amount
         var oldZoom = self.canvas.getZoom();
         var newZoom = self.canvas.getZoom() * zoomAmount;
 
         // Calculate pan position adjustment so we zoom into the mouse's position
-        var panAdjustX = (wickEditor.inputHandler.mouse.x) * (1-zoomAmount);
-        var panAdjustY = (wickEditor.inputHandler.mouse.y) * (1-zoomAmount);
+        var panAdjustX = (zoomX) * (1-zoomAmount);
+        var panAdjustY = (zoomY) * (1-zoomAmount);
 
         // Do da zoom!
         self.canvas.setZoom(newZoom);

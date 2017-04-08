@@ -21,6 +21,8 @@ Tools.Zoom = function (wickEditor) {
 
     var that = this;
 
+    var startX,startY;
+
     this.zoomType = "in";
 
     this.getCursorImage = function () {
@@ -40,12 +42,24 @@ Tools.Zoom = function (wickEditor) {
     
     this.setup = function () {
         wickEditor.fabric.canvas.on('mouse:down', function (e) {
-            if(wickEditor.currentTool instanceof Tools.Zoom) {
-                if (wickEditor.inputHandler.specialKeys["Modifier"]) {
-                    wickEditor.fabric.zoom(0.9);
-                } else {
-                    wickEditor.fabric.zoom(1.1);
-                }
+            startX = wickEditor.inputHandler.mouse.x;
+            startY = wickEditor.inputHandler.mouse.y;
+        });
+        wickEditor.fabric.canvas.on('mouse:up', function (e) {
+            if(!(wickEditor.currentTool instanceof Tools.Zoom)) return;
+
+            endX = wickEditor.inputHandler.mouse.x;
+            endY = wickEditor.inputHandler.mouse.y;
+
+            diffX = Math.abs(endX-startX);
+            diffY = Math.abs(endY-startY);
+
+            if (wickEditor.inputHandler.specialKeys["Modifier"] || wickEditor.inputHandler.keys[keyCharToCode['ALT']]) {
+                wickEditor.fabric.zoom(0.8, endX, endY);
+            } else if (diffX < 10 && diffY < 10) {
+                wickEditor.fabric.zoom(1.2, endX, endY);
+            } else {
+                wickEditor.fabric.zoom(window.innerWidth/diffX, (startX+endX)/2, (startY+endY)/2);
             }
         });
 
@@ -65,7 +79,7 @@ Tools.Zoom = function (wickEditor) {
         if(wickEditor.inputHandler.specialKeys["Modifier"]) {
             var e = window.event || e;
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
-            wickEditor.fabric.zoom(1.0 + delta*.1);
+            wickEditor.fabric.zoom(1.0 + delta*.1, wickEditor.inputHandler.mouse.x, wickEditor.inputHandler.mouse.y);
         }
 
         return false;

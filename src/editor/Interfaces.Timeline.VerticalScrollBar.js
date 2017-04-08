@@ -51,7 +51,6 @@ TimelineInterface.VerticalScrollBar = function (wickEditor, timeline) {
     
         scrollbar.setScrollbarContainerSize(that.elem.offsetHeight);
         scrollbar.setViewboxSize(that.elem.offsetHeight-10);
-        console.log(that.elem.offsetHeight)
         var contentSize = nLayers * cssVar('--layer-height');
         scrollbar.setContentSize(contentSize);
         head.style.marginTop = scrollbar.barPosition + cssVar('--scrollbar-thickness') + 'px';
